@@ -10,7 +10,8 @@ const { t } = useI18n();
 
 const cartStore = useCartStore();
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || '';
-const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
+const stripeEnabled = Boolean(stripeKey);
+const stripePromise = stripeEnabled ? loadStripe(stripeKey) : null;
 
 const cardContainer = ref(null);
 const stripeInstance = ref(null);
@@ -26,7 +27,7 @@ const total = computed(() => cartStore.totalPrice);
 
 const setupStripe = async () => {
   if (stripeInstance.value) return;
-  if (!stripeKey || !stripePromise) {
+  if (!stripeEnabled || !stripePromise) {
     message.value = t('checkout.missingStripeKey');
     return;
   }
@@ -37,7 +38,7 @@ const setupStripe = async () => {
 };
 
 const handleStripePayment = async () => {
-  if (!stripeKey) {
+  if (!stripeEnabled) {
     message.value = t('checkout.missingStripeKey');
     return;
   }
@@ -121,7 +122,11 @@ const renderPayPalButtons = async () => {
 };
 
 onMounted(async () => {
-  await setupStripe();
+  if (!stripeEnabled) {
+    message.value = t('checkout.missingStripeKey');
+  } else {
+    await setupStripe();
+  }
   await renderPayPalButtons();
 });
 
