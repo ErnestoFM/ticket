@@ -128,7 +128,8 @@
     "processing": "Procesando pago...",
     "success": "Pago completado",
     "error": "Error al procesar el pago",
-    "paypalError": "Error en PayPal"
+    "paypalError": "Error en PayPal",
+    "missingStripeKey": "Configura la llave pública de Stripe para continuar"
   },
   "tickets": {
     "title": "Mis boletos",

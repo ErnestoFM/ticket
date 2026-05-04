@@ -128,7 +128,8 @@
     "processing": "Processing payment...",
     "success": "Payment completed",
     "error": "Payment processing error",
-    "paypalError": "PayPal error"
+    "paypalError": "PayPal error",
+    "missingStripeKey": "Configure the Stripe public key to continue"
   },
   "tickets": {
     "title": "My tickets",

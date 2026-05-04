@@ -9,7 +9,8 @@ import { useCartStore } from '../stores/cart';
 const { t } = useI18n();
 
 const cartStore = useCartStore();
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || '';
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const cardContainer = ref(null);
 const stripeInstance = ref(null);
@@ -24,7 +25,11 @@ const selectedSeats = computed(() => cartStore.selectedSeats);
 const total = computed(() => cartStore.totalPrice);
 
 const setupStripe = async () => {
-  if (stripeInstance.value || !import.meta.env.VITE_STRIPE_PUBLIC_KEY) return;
+  if (stripeInstance.value) return;
+  if (!stripeKey || !stripePromise) {
+    message.value = t('checkout.missingStripeKey');
+    return;
+  }
   stripeInstance.value = await stripePromise;
   const elements = stripeInstance.value.elements();
   cardElement.value = elements.create('card');
@@ -32,6 +37,10 @@ const setupStripe = async () => {
 };
 
 const handleStripePayment = async () => {
+  if (!stripeKey) {
+    message.value = t('checkout.missingStripeKey');
+    return;
+  }
   if (!stripeInstance.value || !cardElement.value) return;
   processing.value = true;
   message.value = '';
