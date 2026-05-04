@@ -17,7 +17,7 @@ const logout = async () => {
 
 <template>
   <header class="app-header">
-    <div class="logo">Ticketmaster MX</div>
+    <div class="logo">{{ $t('common.brand') }}</div>
     <nav class="nav-links">
       <router-link to="/">{{ $t('nav.home') }}</router-link>
       <router-link to="/events">{{ $t('nav.events') }}</router-link>

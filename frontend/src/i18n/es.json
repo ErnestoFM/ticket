@@ -19,7 +19,14 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "search": "Buscar",
-    "back": "Volver"
+    "back": "Volver",
+    "close": "Cerrar",
+    "refresh": "Actualizar",
+    "actions": "Acciones",
+    "error": "Ocurrió un error",
+    "next": "Siguiente",
+    "footer": "© 2026 Ticketmaster MX",
+    "brand": "Ticketmaster MX"
   },
   "home": {
     "title": "Ticketmaster MX",
@@ -28,7 +35,10 @@
     "featuresTitle": "Todo lo que necesitas",
     "featureSeats": "Mapa de asientos en tiempo real",
     "featurePayments": "Pagos seguros con Stripe y PayPal",
-    "featureTickets": "Boletos digitales con QR y WhatsApp"
+    "featureTickets": "Boletos digitales con QR y WhatsApp",
+    "featureSeatsDesc": "Reserva asientos en tiempo real y asegúralos en minutos.",
+    "featurePaymentsDesc": "Pagos con tarjeta, Stripe y PayPal de forma segura.",
+    "featureTicketsDesc": "Recibe tu boleto en PDF con QR vía WhatsApp."
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -47,7 +57,11 @@
     "submit": "Enviar",
     "loginButton": "Entrar",
     "registerButton": "Registrarse",
-    "logoutSuccess": "Sesión cerrada"
+    "logoutSuccess": "Sesión cerrada",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "curpGenerated": "CURP generada: {curp}",
+    "birthDatePlaceholder": "DD/MM/AAAA",
+    "phonePlaceholder": "+52XXXXXXXXXX"
   },
   "events": {
     "title": "Eventos",
@@ -59,7 +73,33 @@
     "selectSeats": "Seleccionar asientos",
     "createEvent": "Crear evento",
     "status": "Estatus",
-    "maxTickets": "Máximo por usuario"
+    "maxTickets": "Máximo por usuario",
+    "form": {
+      "venue": "Recinto",
+      "venuePlaceholder": "Selecciona recinto",
+      "title": "Título",
+      "type": "Tipo",
+      "date": "Fecha",
+      "duration": "Duración (min)",
+      "basePrice": "Precio base",
+      "maxTickets": "Máximo por usuario",
+      "posterUrl": "Poster URL",
+      "bannerUrl": "Banner URL",
+      "description": "Descripción",
+      "submitCreate": "Guardar evento",
+      "submitUpdate": "Actualizar evento"
+    },
+    "types": {
+      "teatro": "Teatro",
+      "cine": "Cine",
+      "museo": "Museo"
+    },
+    "statusLabels": {
+      "activo": "Activo",
+      "cancelado": "Cancelado",
+      "agotado": "Agotado",
+      "finalizado": "Finalizado"
+    }
   },
   "seatMap": {
     "title": "Mapa de asientos",
@@ -74,7 +114,9 @@
     "summary": "Resumen",
     "total": "Total",
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar"
+    "zoomOut": "Alejar",
+    "selectionLimit": "Has alcanzado el máximo de boletos para este evento",
+    "holdError": "No se pudo apartar el asiento"
   },
   "checkout": {
     "title": "Checkout",
@@ -83,12 +125,20 @@
     "payWithCard": "Pagar con tarjeta",
     "payWithPaypal": "Pagar con PayPal",
     "confirm": "Confirmar pago",
-    "processing": "Procesando pago..."
+    "processing": "Procesando pago...",
+    "success": "Pago completado",
+    "error": "Error al procesar el pago",
+    "paypalError": "Error en PayPal"
   },
   "tickets": {
     "title": "Mis boletos",
     "empty": "Aún no tienes boletos",
-    "view": "Ver boleto"
+    "view": "Ver boleto",
+    "date": "Fecha",
+    "price": "Precio",
+    "venue": "Recinto",
+    "seat": "Asiento",
+    "unknownEvent": "Evento"
   },
   "admin": {
     "dashboard": "Panel de administración",
@@ -101,6 +151,89 @@
     "totalSales": "Ventas totales",
     "occupancy": "Ocupación",
     "paymentMethods": "Métodos de pago",
-    "exportCsv": "Exportar CSV"
+    "exportCsv": "Exportar CSV",
+    "dashboardSubtitle": "Administra recintos, eventos, usuarios y reportes.",
+    "eventsDescription": "Crea, edita y cancela eventos activos.",
+    "venuesDescription": "Configura recintos y zonas de asientos.",
+    "usersDescription": "Gestiona cuentas y consulta boletos.",
+    "reportsDescription": "Revisa ventas, ocupación e ingresos.",
+    "editEvent": "Editar evento",
+    "editVenue": "Editar recinto",
+    "cancelEvent": "Cancelar evento",
+    "noEvents": "No hay eventos registrados",
+    "noVenues": "No hay recintos registrados",
+    "noUsers": "No hay usuarios registrados",
+    "noTickets": "Sin boletos",
+    "status": "Estatus",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "viewTickets": "Ver boletos",
+    "hideTickets": "Ocultar boletos",
+    "phone": "Teléfono",
+    "role": "Rol",
+    "ticketsLabel": "boletos"
+  }
+  ,
+  "venues": {
+    "form": {
+      "name": "Nombre",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "state": "Estado",
+      "type": "Tipo",
+      "totalRows": "Filas",
+      "totalCols": "Columnas",
+      "logoUrl": "Logo URL",
+      "zoneConfig": "Zonas de asientos",
+      "rowStart": "Fila inicio",
+      "rowEnd": "Fila fin",
+      "seatType": "Tipo de asiento",
+      "addZone": "Agregar zona",
+      "removeZone": "Quitar",
+      "submitCreate": "Guardar recinto",
+      "submitUpdate": "Actualizar recinto"
+    },
+    "seatTypes": {
+      "general": "General",
+      "preferente": "Preferente",
+      "vip": "VIP",
+      "palco": "Palco"
+    }
+  },
+  "states": {
+    "AS": "Aguascalientes",
+    "BC": "Baja California",
+    "BS": "Baja California Sur",
+    "CC": "Campeche",
+    "CL": "Coahuila",
+    "CM": "Colima",
+    "CS": "Chiapas",
+    "CH": "Chihuahua",
+    "DF": "Ciudad de México",
+    "DG": "Durango",
+    "GT": "Guanajuato",
+    "GR": "Guerrero",
+    "HG": "Hidalgo",
+    "JC": "Jalisco",
+    "MC": "Estado de México",
+    "MN": "Michoacán",
+    "MS": "Morelos",
+    "NT": "Nayarit",
+    "NL": "Nuevo León",
+    "OC": "Oaxaca",
+    "PL": "Puebla",
+    "QT": "Querétaro",
+    "QR": "Quintana Roo",
+    "SP": "San Luis Potosí",
+    "SL": "Sinaloa",
+    "SR": "Sonora",
+    "TC": "Tabasco",
+    "TS": "Tamaulipas",
+    "TL": "Tlaxcala",
+    "VZ": "Veracruz",
+    "YN": "Yucatán",
+    "ZS": "Zacatecas"
   }
 }

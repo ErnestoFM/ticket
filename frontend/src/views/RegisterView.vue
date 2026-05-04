@@ -1,45 +1,47 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const generatedCurp = ref('');
 const formError = ref('');
 
-const STATES = [
-  { code: 'AS', name: 'Aguascalientes' },
-  { code: 'BC', name: 'Baja California' },
-  { code: 'BS', name: 'Baja California Sur' },
-  { code: 'CC', name: 'Campeche' },
-  { code: 'CL', name: 'Coahuila' },
-  { code: 'CM', name: 'Colima' },
-  { code: 'CS', name: 'Chiapas' },
-  { code: 'CH', name: 'Chihuahua' },
-  { code: 'DF', name: 'Ciudad de México' },
-  { code: 'DG', name: 'Durango' },
-  { code: 'GT', name: 'Guanajuato' },
-  { code: 'GR', name: 'Guerrero' },
-  { code: 'HG', name: 'Hidalgo' },
-  { code: 'JC', name: 'Jalisco' },
-  { code: 'MC', name: 'Estado de México' },
-  { code: 'MN', name: 'Michoacán' },
-  { code: 'MS', name: 'Morelos' },
-  { code: 'NT', name: 'Nayarit' },
-  { code: 'NL', name: 'Nuevo León' },
-  { code: 'OC', name: 'Oaxaca' },
-  { code: 'PL', name: 'Puebla' },
-  { code: 'QT', name: 'Querétaro' },
-  { code: 'QR', name: 'Quintana Roo' },
-  { code: 'SP', name: 'San Luis Potosí' },
-  { code: 'SL', name: 'Sinaloa' },
-  { code: 'SR', name: 'Sonora' },
-  { code: 'TC', name: 'Tabasco' },
-  { code: 'TS', name: 'Tamaulipas' },
-  { code: 'TL', name: 'Tlaxcala' },
-  { code: 'VZ', name: 'Veracruz' },
-  { code: 'YN', name: 'Yucatán' },
-  { code: 'ZS', name: 'Zacatecas' }
-];
+const states = computed(() => ([
+  { code: 'AS', name: t('states.AS') },
+  { code: 'BC', name: t('states.BC') },
+  { code: 'BS', name: t('states.BS') },
+  { code: 'CC', name: t('states.CC') },
+  { code: 'CL', name: t('states.CL') },
+  { code: 'CM', name: t('states.CM') },
+  { code: 'CS', name: t('states.CS') },
+  { code: 'CH', name: t('states.CH') },
+  { code: 'DF', name: t('states.DF') },
+  { code: 'DG', name: t('states.DG') },
+  { code: 'GT', name: t('states.GT') },
+  { code: 'GR', name: t('states.GR') },
+  { code: 'HG', name: t('states.HG') },
+  { code: 'JC', name: t('states.JC') },
+  { code: 'MC', name: t('states.MC') },
+  { code: 'MN', name: t('states.MN') },
+  { code: 'MS', name: t('states.MS') },
+  { code: 'NT', name: t('states.NT') },
+  { code: 'NL', name: t('states.NL') },
+  { code: 'OC', name: t('states.OC') },
+  { code: 'PL', name: t('states.PL') },
+  { code: 'QT', name: t('states.QT') },
+  { code: 'QR', name: t('states.QR') },
+  { code: 'SP', name: t('states.SP') },
+  { code: 'SL', name: t('states.SL') },
+  { code: 'SR', name: t('states.SR') },
+  { code: 'TC', name: t('states.TC') },
+  { code: 'TS', name: t('states.TS') },
+  { code: 'TL', name: t('states.TL') },
+  { code: 'VZ', name: t('states.VZ') },
+  { code: 'YN', name: t('states.YN') },
+  { code: 'ZS', name: t('states.ZS') }
+]));
 
 const form = reactive({
   firstName: '',
@@ -58,7 +60,7 @@ const submit = async () => {
   formError.value = '';
   generatedCurp.value = '';
   if (form.password !== form.confirmPassword) {
-    formError.value = 'Las contraseñas no coinciden';
+    formError.value = t('auth.passwordMismatch');
     return;
   }
   try {
@@ -93,10 +95,10 @@ const submit = async () => {
         <label>{{ $t('auth.motherLastName') }}<input v-model="form.motherLastName" /></label>
       </div>
       <div class="grid-two">
-        <label>{{ $t('auth.birthDate') }}<input v-model="form.birthDate" placeholder="DD/MM/AAAA" required /></label>
+        <label>{{ $t('auth.birthDate') }}<input v-model="form.birthDate" :placeholder="$t('auth.birthDatePlaceholder')" required /></label>
         <label>{{ $t('auth.birthState') }}
           <select v-model="form.birthState">
-            <option v-for="state in STATES" :key="state.code" :value="state.code">{{ state.name }} ({{ state.code }})</option>
+            <option v-for="state in states" :key="state.code" :value="state.code">{{ state.name }} ({{ state.code }})</option>
           </select>
         </label>
       </div>
@@ -107,14 +109,14 @@ const submit = async () => {
             <option value="M">M</option>
           </select>
         </label>
-        <label>{{ $t('auth.phone') }}<input v-model="form.phone" placeholder="+52XXXXXXXXXX" required /></label>
+        <label>{{ $t('auth.phone') }}<input v-model="form.phone" :placeholder="$t('auth.phonePlaceholder')" required /></label>
       </div>
       <div class="grid-two">
         <label>{{ $t('auth.password') }}<input v-model="form.password" type="password" required /></label>
         <label>{{ $t('auth.confirmPassword') }}<input v-model="form.confirmPassword" type="password" required /></label>
       </div>
       <button class="primary" type="submit">{{ $t('auth.registerButton') }}</button>
-      <p v-if="generatedCurp" class="success">CURP: {{ generatedCurp }}</p>
+      <p v-if="generatedCurp" class="success">{{ $t('auth.curpGenerated', { curp: generatedCurp }) }}</p>
       <p v-if="formError" class="error">{{ formError }}</p>
     </form>
   </section>

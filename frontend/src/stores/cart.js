@@ -20,33 +20,45 @@ export const useCartStore = defineStore('cart', {
   actions: {
     async holdSeat(event, seat) {
       this.lastError = null;
-      const response = await api.post('/api/reservations/hold', {
-        eventId: event.id,
-        seatId: seat.id,
-      });
+      try {
+        const response = await api.post('/api/reservations/hold', {
+          eventId: event.id,
+          seatId: seat.id,
+        });
 
-      const multiplier = seat.seatType?.multiplier ? parseFloat(seat.seatType.multiplier) : 1.0;
-      const price = parseFloat(event.basePrice) * multiplier;
+        const multiplier = seat.seatType?.multiplier ? parseFloat(seat.seatType.multiplier) : 1.0;
+        const price = parseFloat(event.basePrice) * multiplier;
 
-      this.selectedSeats.push({
-        seat,
-        reservationId: response.data.reservationId,
-        expiresAt: response.data.expiresAt,
-        eventId: event.id,
-        price,
-      });
+        this.selectedSeats.push({
+          seat,
+          reservationId: response.data.reservationId,
+          expiresAt: response.data.expiresAt,
+          eventId: event.id,
+          price,
+        });
 
-      return response.data;
+        return response.data;
+      } catch (err) {
+        this.lastError = err.response?.data?.error || null;
+        throw err;
+      }
     },
     async releaseSeat(reservationId) {
-      await api.post('/api/reservations/cancel', { reservationId });
-      this.selectedSeats = this.selectedSeats.filter((item) => item.reservationId !== reservationId);
+      try {
+        await api.post('/api/reservations/cancel', { reservationId });
+        this.selectedSeats = this.selectedSeats.filter((item) => item.reservationId !== reservationId);
+      } catch (err) {
+        this.lastError = err.response?.data?.error || null;
+        throw err;
+      }
     },
     removeSeat(reservationId) {
       this.selectedSeats = this.selectedSeats.filter((item) => item.reservationId !== reservationId);
+      this.lastError = null;
     },
     clearAll() {
       this.selectedSeats = [];
+      this.lastError = null;
     },
   },
 });

@@ -2,8 +2,11 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { loadStripe } from '@stripe/stripe-js';
 import { loadScript } from '@paypal/paypal-js';
+import { useI18n } from 'vue-i18n';
 import api from '../api/axios';
 import { useCartStore } from '../stores/cart';
+
+const { t } = useI18n();
 
 const cartStore = useCartStore();
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
@@ -55,9 +58,9 @@ const handleStripePayment = async () => {
       cartStore.removeSeat(reservation.reservationId);
     }
 
-    message.value = 'Pago completado';
+    message.value = t('checkout.success');
   } catch (err) {
-    message.value = err.message || 'Error al procesar el pago';
+    message.value = err?.response?.data?.error || err.message || t('checkout.error');
   } finally {
     processing.value = false;
   }
@@ -100,7 +103,7 @@ const renderPayPalButtons = async () => {
         cartStore.removeSeat(reservation.reservationId);
       },
       onError: (err) => {
-        message.value = err.message || 'Error en PayPal';
+        message.value = err.message || t('checkout.paypalError');
       },
     }).render(`#${containerId}`);
 

@@ -19,7 +19,14 @@
     "edit": "Edit",
     "delete": "Delete",
     "search": "Search",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close",
+    "refresh": "Refresh",
+    "actions": "Actions",
+    "error": "Something went wrong",
+    "next": "Next",
+    "footer": "© 2026 Ticketmaster MX",
+    "brand": "Ticketmaster MX"
   },
   "home": {
     "title": "Ticketmaster MX",
@@ -28,7 +35,10 @@
     "featuresTitle": "Everything you need",
     "featureSeats": "Real-time seat map",
     "featurePayments": "Secure payments with Stripe and PayPal",
-    "featureTickets": "Digital tickets with QR and WhatsApp"
+    "featureTickets": "Digital tickets with QR and WhatsApp",
+    "featureSeatsDesc": "Reserve seats in real time and secure them in minutes.",
+    "featurePaymentsDesc": "Pay safely with cards, Stripe, and PayPal.",
+    "featureTicketsDesc": "Receive your PDF ticket with QR via WhatsApp."
   },
   "auth": {
     "loginTitle": "Login",
@@ -47,7 +57,11 @@
     "submit": "Submit",
     "loginButton": "Sign in",
     "registerButton": "Register",
-    "logoutSuccess": "Logged out"
+    "logoutSuccess": "Logged out",
+    "passwordMismatch": "Passwords do not match",
+    "curpGenerated": "Generated CURP: {curp}",
+    "birthDatePlaceholder": "DD/MM/YYYY",
+    "phonePlaceholder": "+52XXXXXXXXXX"
   },
   "events": {
     "title": "Events",
@@ -59,7 +73,33 @@
     "selectSeats": "Select seats",
     "createEvent": "Create event",
     "status": "Status",
-    "maxTickets": "Max per user"
+    "maxTickets": "Max per user",
+    "form": {
+      "venue": "Venue",
+      "venuePlaceholder": "Select venue",
+      "title": "Title",
+      "type": "Type",
+      "date": "Date",
+      "duration": "Duration (min)",
+      "basePrice": "Base price",
+      "maxTickets": "Max per user",
+      "posterUrl": "Poster URL",
+      "bannerUrl": "Banner URL",
+      "description": "Description",
+      "submitCreate": "Save event",
+      "submitUpdate": "Update event"
+    },
+    "types": {
+      "teatro": "Theater",
+      "cine": "Cinema",
+      "museo": "Museum"
+    },
+    "statusLabels": {
+      "activo": "Active",
+      "cancelado": "Cancelled",
+      "agotado": "Sold out",
+      "finalizado": "Finished"
+    }
   },
   "seatMap": {
     "title": "Seat map",
@@ -74,7 +114,9 @@
     "summary": "Summary",
     "total": "Total",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "selectionLimit": "You have reached the maximum number of tickets for this event",
+    "holdError": "Unable to hold the seat"
   },
   "checkout": {
     "title": "Checkout",
@@ -83,12 +125,20 @@
     "payWithCard": "Pay with card",
     "payWithPaypal": "Pay with PayPal",
     "confirm": "Confirm payment",
-    "processing": "Processing payment..."
+    "processing": "Processing payment...",
+    "success": "Payment completed",
+    "error": "Payment processing error",
+    "paypalError": "PayPal error"
   },
   "tickets": {
     "title": "My tickets",
     "empty": "You don't have tickets yet",
-    "view": "View ticket"
+    "view": "View ticket",
+    "date": "Date",
+    "price": "Price",
+    "venue": "Venue",
+    "seat": "Seat",
+    "unknownEvent": "Event"
   },
   "admin": {
     "dashboard": "Admin dashboard",
@@ -101,6 +151,89 @@
     "totalSales": "Total sales",
     "occupancy": "Occupancy",
     "paymentMethods": "Payment methods",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dashboardSubtitle": "Manage venues, events, users, and reports.",
+    "eventsDescription": "Create, edit, and cancel active events.",
+    "venuesDescription": "Configure venues and seat zones.",
+    "usersDescription": "Manage accounts and review tickets.",
+    "reportsDescription": "Track sales, occupancy, and revenue.",
+    "editEvent": "Edit event",
+    "editVenue": "Edit venue",
+    "cancelEvent": "Cancel event",
+    "noEvents": "No events found",
+    "noVenues": "No venues found",
+    "noUsers": "No users found",
+    "noTickets": "No tickets",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "viewTickets": "View tickets",
+    "hideTickets": "Hide tickets",
+    "phone": "Phone",
+    "role": "Role",
+    "ticketsLabel": "tickets"
+  }
+  ,
+  "venues": {
+    "form": {
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "type": "Type",
+      "totalRows": "Rows",
+      "totalCols": "Columns",
+      "logoUrl": "Logo URL",
+      "zoneConfig": "Seat zones",
+      "rowStart": "Row start",
+      "rowEnd": "Row end",
+      "seatType": "Seat type",
+      "addZone": "Add zone",
+      "removeZone": "Remove",
+      "submitCreate": "Save venue",
+      "submitUpdate": "Update venue"
+    },
+    "seatTypes": {
+      "general": "General",
+      "preferente": "Preferred",
+      "vip": "VIP",
+      "palco": "Box"
+    }
+  },
+  "states": {
+    "AS": "Aguascalientes",
+    "BC": "Baja California",
+    "BS": "Baja California Sur",
+    "CC": "Campeche",
+    "CL": "Coahuila",
+    "CM": "Colima",
+    "CS": "Chiapas",
+    "CH": "Chihuahua",
+    "DF": "Mexico City",
+    "DG": "Durango",
+    "GT": "Guanajuato",
+    "GR": "Guerrero",
+    "HG": "Hidalgo",
+    "JC": "Jalisco",
+    "MC": "State of Mexico",
+    "MN": "Michoacán",
+    "MS": "Morelos",
+    "NT": "Nayarit",
+    "NL": "Nuevo León",
+    "OC": "Oaxaca",
+    "PL": "Puebla",
+    "QT": "Querétaro",
+    "QR": "Quintana Roo",
+    "SP": "San Luis Potosí",
+    "SL": "Sinaloa",
+    "SR": "Sonora",
+    "TC": "Tabasco",
+    "TS": "Tamaulipas",
+    "TL": "Tlaxcala",
+    "VZ": "Veracruz",
+    "YN": "Yucatán",
+    "ZS": "Zacatecas"
   }
 }

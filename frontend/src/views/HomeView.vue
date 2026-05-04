@@ -11,15 +11,15 @@
     <div class="feature-grid">
       <div>
         <h3>{{ $t('home.featureSeats') }}</h3>
-        <p>Reserva asientos en tiempo real y asegúralos en minutos.</p>
+        <p>{{ $t('home.featureSeatsDesc') }}</p>
       </div>
       <div>
         <h3>{{ $t('home.featurePayments') }}</h3>
-        <p>Pagos con tarjeta, Stripe y PayPal de forma segura.</p>
+        <p>{{ $t('home.featurePaymentsDesc') }}</p>
       </div>
       <div>
         <h3>{{ $t('home.featureTickets') }}</h3>
-        <p>Recibe tu boleto en PDF con QR vía WhatsApp.</p>
+        <p>{{ $t('home.featureTicketsDesc') }}</p>
       </div>
     </div>
   </section>

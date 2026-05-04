@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import SeatMap from '../components/seats/SeatMap.vue';
 import SeatLegend from '../components/seats/SeatLegend.vue';
@@ -14,6 +15,7 @@ const eventStore = useEventStore();
 const seatStore = useSeatStore();
 const cartStore = useCartStore();
 
+const { t } = useI18n();
 const eventId = computed(() => route.params.id);
 const timeLeft = ref('00:00');
 const showExpiredModal = ref(false);
@@ -24,6 +26,14 @@ let countdownTimer;
 
 const selectedSeatIds = computed(() => cartStore.selectedSeats.map((item) => item.seat.id));
 
+const selectionError = computed(() => cartStore.lastError);
+
+const releaseAllSelections = async () => {
+  const reservations = [...cartStore.selectedSeats];
+  await Promise.allSettled(reservations.map((item) => cartStore.releaseSeat(item.reservationId)));
+  cartStore.clearAll();
+};
+
 const updateCountdown = () => {
   const nextExpiry = cartStore.soonestExpiry;
   if (!nextExpiry) {
@@ -32,7 +42,7 @@ const updateCountdown = () => {
   }
   const diff = nextExpiry - Date.now();
   if (diff <= 0) {
-    cartStore.clearAll();
+    releaseAllSelections();
     showExpiredModal.value = true;
     timeLeft.value = '00:00';
     return;
@@ -49,16 +59,25 @@ const toggleSeat = async (seat) => {
   if (isSelected) {
     const reservation = cartStore.selectedSeats.find((item) => item.seat.id === seat.id);
     if (reservation) {
-      await cartStore.releaseSeat(reservation.reservationId);
+      try {
+        await cartStore.releaseSeat(reservation.reservationId);
+      } catch (_) {
+        cartStore.lastError = cartStore.lastError || t('seatMap.holdError');
+      }
     }
     return;
   }
 
   if (cartStore.selectedSeats.length >= eventStore.currentEvent.maxTicketsPerUser) {
+    cartStore.lastError = t('seatMap.selectionLimit');
     return;
   }
 
-  await cartStore.holdSeat(eventStore.currentEvent, seat);
+  try {
+    await cartStore.holdSeat(eventStore.currentEvent, seat);
+  } catch (_) {
+    cartStore.lastError = cartStore.lastError || t('seatMap.holdError');
+  }
 };
 
 const goToCheckout = () => {
@@ -113,6 +132,7 @@ onUnmounted(() => {
           :total="cartStore.totalPrice"
           :time-left="timeLeft"
         />
+        <p v-if="selectionError" class="error">{{ selectionError }}</p>
         <button class="primary" :disabled="!cartStore.hasSelection" @click="goToCheckout">
           {{ $t('checkout.confirm') }}
         </button>
@@ -122,7 +142,7 @@ onUnmounted(() => {
     <div v-if="showExpiredModal" class="modal">
       <div class="modal-content">
         <p>{{ $t('seatMap.releaseNotice') }}</p>
-        <button class="primary" @click="showExpiredModal = false">OK</button>
+        <button class="primary" @click="showExpiredModal = false">{{ $t('common.close') }}</button>
       </div>
     </div>
   </section>
