@@ -10,6 +10,7 @@
     "test:integration": "jest tests/integration --runInBand --forceExit"
   },
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -20,15 +21,14 @@
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.1.1",
     "mysql2": "^3.6.5",
     "pdfkit": "^0.14.0",
     "qrcode": "^1.5.3",
     "sequelize": "^6.35.1",
     "stripe": "^14.9.0",
     "twilio": "^4.19.3",
-    "uuid": "^9.0.0",
-    "@paypal/checkout-server-sdk": "^1.0.3"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
@@ -37,7 +37,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["./tests/setup.js"],
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ],
     "testTimeout": 30000
   }
 }
