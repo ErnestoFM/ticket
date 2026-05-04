@@ -1,0 +1,106 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "events": "Eventos",
+    "tickets": "Mis boletos",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "admin": "Admin",
+    "logout": "Cerrar sesión",
+    "dashboard": "Panel",
+    "venues": "Recintos",
+    "users": "Usuarios",
+    "reports": "Reportes"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "search": "Buscar",
+    "back": "Volver"
+  },
+  "home": {
+    "title": "Ticketmaster MX",
+    "subtitle": "Compra tus boletos de forma segura y rápida",
+    "cta": "Explorar eventos",
+    "featuresTitle": "Todo lo que necesitas",
+    "featureSeats": "Mapa de asientos en tiempo real",
+    "featurePayments": "Pagos seguros con Stripe y PayPal",
+    "featureTickets": "Boletos digitales con QR y WhatsApp"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "registerTitle": "Crear cuenta",
+    "curp": "CURP",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "firstName": "Nombre(s)",
+    "secondName": "Segundo nombre",
+    "lastName": "Apellido paterno",
+    "motherLastName": "Apellido materno",
+    "birthDate": "Fecha de nacimiento (DD/MM/AAAA)",
+    "birthState": "Estado de nacimiento",
+    "gender": "Género",
+    "phone": "Teléfono",
+    "submit": "Enviar",
+    "loginButton": "Entrar",
+    "registerButton": "Registrarse",
+    "logoutSuccess": "Sesión cerrada"
+  },
+  "events": {
+    "title": "Eventos",
+    "type": "Tipo",
+    "date": "Fecha",
+    "duration": "Duración",
+    "price": "Precio base",
+    "details": "Detalles",
+    "selectSeats": "Seleccionar asientos",
+    "createEvent": "Crear evento",
+    "status": "Estatus",
+    "maxTickets": "Máximo por usuario"
+  },
+  "seatMap": {
+    "title": "Mapa de asientos",
+    "legend": "Leyenda",
+    "available": "Disponible",
+    "held": "Apartado",
+    "sold": "Vendido",
+    "selected": "Seleccionado",
+    "inactive": "Inactivo",
+    "counter": "Tiempo restante",
+    "releaseNotice": "Tu selección expiró. Vuelve a elegir asientos.",
+    "summary": "Resumen",
+    "total": "Total",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "selectedSeats": "Asientos seleccionados",
+    "total": "Total",
+    "payWithCard": "Pagar con tarjeta",
+    "payWithPaypal": "Pagar con PayPal",
+    "confirm": "Confirmar pago",
+    "processing": "Procesando pago..."
+  },
+  "tickets": {
+    "title": "Mis boletos",
+    "empty": "Aún no tienes boletos",
+    "view": "Ver boleto"
+  },
+  "admin": {
+    "dashboard": "Panel de administración",
+    "events": "Administrar eventos",
+    "venues": "Administrar recintos",
+    "users": "Usuarios",
+    "reports": "Reportes",
+    "createVenue": "Crear recinto",
+    "createEvent": "Crear evento",
+    "totalSales": "Ventas totales",
+    "occupancy": "Ocupación",
+    "paymentMethods": "Métodos de pago",
+    "exportCsv": "Exportar CSV"
+  }
+}

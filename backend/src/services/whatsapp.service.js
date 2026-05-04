@@ -62,4 +62,38 @@ async function sendTicketWhatsApp(ticket, user, event, pdfUrl = null) {
   return { sid: message.sid };
 }
 
-module.exports = { sendTicketWhatsApp };
+async function sendCancellationWhatsApp(ticket, user, event) {
+  const client = getClient();
+
+  const dateObj = new Date(event.date);
+  const dateStr = dateObj.toLocaleDateString('es-MX', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+
+  const fullName = [user.firstName, user.secondName, user.lastName, user.motherLastName]
+    .filter(Boolean)
+    .join(' ');
+
+  const messageBody = [
+    `⚠️ *TICKETMASTER MX - Evento Cancelado*`,
+    ``,
+    `Hola ${fullName},`,
+    `Lamentamos informarte que el evento ha sido cancelado:`,
+    ``,
+    `🎪 *Evento:* ${event.title}`,
+    `📅 *Fecha:* ${dateStr}`,
+    `📋 *Confirmación:* ${ticket.id}`,
+    ``,
+    `El equipo de Ticketmaster MX se pondrá en contacto contigo para el reembolso correspondiente.`,
+  ].join('\n');
+
+  const message = await client.messages.create({
+    body: messageBody,
+    from: env.twilio.whatsappFrom,
+    to: `whatsapp:${user.phone}`,
+  });
+
+  return { sid: message.sid };
+}
+
+module.exports = { sendTicketWhatsApp, sendCancellationWhatsApp };

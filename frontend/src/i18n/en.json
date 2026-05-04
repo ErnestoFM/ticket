@@ -1,0 +1,106 @@
+{
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "tickets": "My tickets",
+    "login": "Login",
+    "register": "Register",
+    "admin": "Admin",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "venues": "Venues",
+    "users": "Users",
+    "reports": "Reports"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "back": "Back"
+  },
+  "home": {
+    "title": "Ticketmaster MX",
+    "subtitle": "Buy your tickets safely and quickly",
+    "cta": "Browse events",
+    "featuresTitle": "Everything you need",
+    "featureSeats": "Real-time seat map",
+    "featurePayments": "Secure payments with Stripe and PayPal",
+    "featureTickets": "Digital tickets with QR and WhatsApp"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Create account",
+    "curp": "CURP",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "firstName": "First name",
+    "secondName": "Second name",
+    "lastName": "Paternal last name",
+    "motherLastName": "Maternal last name",
+    "birthDate": "Birth date (DD/MM/YYYY)",
+    "birthState": "Birth state",
+    "gender": "Gender",
+    "phone": "Phone",
+    "submit": "Submit",
+    "loginButton": "Sign in",
+    "registerButton": "Register",
+    "logoutSuccess": "Logged out"
+  },
+  "events": {
+    "title": "Events",
+    "type": "Type",
+    "date": "Date",
+    "duration": "Duration",
+    "price": "Base price",
+    "details": "Details",
+    "selectSeats": "Select seats",
+    "createEvent": "Create event",
+    "status": "Status",
+    "maxTickets": "Max per user"
+  },
+  "seatMap": {
+    "title": "Seat map",
+    "legend": "Legend",
+    "available": "Available",
+    "held": "Held",
+    "sold": "Sold",
+    "selected": "Selected",
+    "inactive": "Inactive",
+    "counter": "Time left",
+    "releaseNotice": "Your selection expired. Please choose seats again.",
+    "summary": "Summary",
+    "total": "Total",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "selectedSeats": "Selected seats",
+    "total": "Total",
+    "payWithCard": "Pay with card",
+    "payWithPaypal": "Pay with PayPal",
+    "confirm": "Confirm payment",
+    "processing": "Processing payment..."
+  },
+  "tickets": {
+    "title": "My tickets",
+    "empty": "You don't have tickets yet",
+    "view": "View ticket"
+  },
+  "admin": {
+    "dashboard": "Admin dashboard",
+    "events": "Manage events",
+    "venues": "Manage venues",
+    "users": "Users",
+    "reports": "Reports",
+    "createVenue": "Create venue",
+    "createEvent": "Create event",
+    "totalSales": "Total sales",
+    "occupancy": "Occupancy",
+    "paymentMethods": "Payment methods",
+    "exportCsv": "Export CSV"
+  }
+}

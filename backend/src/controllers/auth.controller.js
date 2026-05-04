@@ -20,6 +20,18 @@ function handleValidation(req, res) {
   return true;
 }
 
+function parseBirthDate(input) {
+  if (!input) return null;
+  if (typeof input === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
+    const [day, month, year] = input.split('/');
+    const iso = `${year}-${month}-${day}`;
+    const date = new Date(iso);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  const date = new Date(input);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 const registerValidation = [
   body('firstName').trim().notEmpty().withMessage('First name is required').isLength({ max: 100 }),
   body('lastName').trim().notEmpty().withMessage('Paternal last name is required').isLength({ max: 100 }),
@@ -27,7 +39,12 @@ const registerValidation = [
   body('secondName').optional().trim().isLength({ max: 100 }),
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
   body('phone').trim().notEmpty().withMessage('Phone is required').isMobilePhone('es-MX').withMessage('Invalid Mexican phone number'),
-  body('birthDate').isDate().withMessage('Valid birth date required'),
+  body('birthDate').custom((value) => {
+    if (!parseBirthDate(value)) {
+      throw new Error('Valid birth date required');
+    }
+    return true;
+  }),
   body('birthState').trim().isLength({ min: 2, max: 2 }).withMessage('Birth state code must be 2 characters').toUpperCase(),
   body('gender').isIn(['H', 'M']).withMessage('Gender must be H or M'),
 ];
@@ -37,8 +54,12 @@ async function register(req, res, next) {
     if (!handleValidation(req, res)) return;
 
     const { firstName, secondName, lastName, motherLastName, password, phone, birthDate, birthState, gender } = req.body;
+    const parsedBirthDate = parseBirthDate(birthDate);
+    if (!parsedBirthDate) {
+      return res.status(422).json({ error: 'Valid birth date required' });
+    }
 
-    const curp = generateCURP({ firstName, secondName, lastName, motherLastName, birthDate, gender, birthState });
+    const curp = generateCURP({ firstName, secondName, lastName, motherLastName, birthDate: parsedBirthDate, gender, birthState });
 
     const existingUser = await User.findOne({ where: { curp } });
     if (existingUser) {
@@ -53,7 +74,7 @@ async function register(req, res, next) {
       curp,
       password,
       phone,
-      birthDate,
+      birthDate: parsedBirthDate,
       birthState,
       gender,
       role: 'user',

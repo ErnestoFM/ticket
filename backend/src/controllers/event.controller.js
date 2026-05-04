@@ -3,7 +3,7 @@
 const { Op } = require('sequelize');
 const { body, query, param, validationResult } = require('express-validator');
 const { Event, Venue, Seat, Ticket, User } = require('../models');
-const { sendTicketWhatsApp } = require('../services/whatsapp.service');
+const { sendCancellationWhatsApp } = require('../services/whatsapp.service');
 const env = require('../config/env');
 
 function handleValidation(req, res) {
@@ -188,7 +188,7 @@ async function cancel(req, res, next) {
 
     const notifyPromises = tickets.map(async (ticket) => {
       try {
-        await sendTicketWhatsApp(ticket, ticket.user, event, null);
+        await sendCancellationWhatsApp(ticket, ticket.user, event);
       } catch (err) {
         console.error('[EventController] WhatsApp notification failed:', err.message);
       }

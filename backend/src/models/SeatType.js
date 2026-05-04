@@ -18,7 +18,7 @@ const SeatType = sequelize.define('SeatType', {
   color: {
     type: DataTypes.STRING(7),
     allowNull: false,
-    defaultValue: '#808080',
+    defaultValue: '#9E9E9E',
     validate: {
       is: /^#[0-9A-Fa-f]{6}$/,
     },

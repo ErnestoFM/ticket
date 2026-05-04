@@ -1,9 +1,9 @@
 'use strict';
 
 const { body, validationResult } = require('express-validator');
-const { constructWebhookEvent } = require('../services/stripe.service');
+const { constructWebhookEvent, createPaymentIntent } = require('../services/stripe.service');
 const { createOrder, captureOrder } = require('../services/paypal.service');
-const { Ticket, Reservation, Event } = require('../models');
+const { Reservation, Event, Seat, SeatType } = require('../models');
 
 function handleValidation(req, res) {
   const errors = validationResult(req);
@@ -55,6 +55,55 @@ async function stripeWebhook(req, res, next) {
   }
 }
 
+const createStripeIntentValidation = [
+  body('reservationId').isUUID().withMessage('Valid reservation ID required'),
+];
+
+async function createStripeIntent(req, res, next) {
+  try {
+    if (!handleValidation(req, res)) return;
+
+    const { reservationId } = req.body;
+    const userId = req.user.id;
+
+    const reservation = await Reservation.findOne({
+      where: { id: reservationId, userId, status: 'held' },
+      include: [
+        { model: Event, as: 'event' },
+        { model: Seat, as: 'seat', include: [{ model: SeatType, as: 'seatType' }] },
+      ],
+    });
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Active reservation not found' });
+    }
+
+    if (new Date() > reservation.expiresAt) {
+      return res.status(410).json({ error: 'Reservation has expired' });
+    }
+
+    const multiplier = reservation.seat?.seatType
+      ? parseFloat(reservation.seat.seatType.multiplier)
+      : 1.0;
+    const amount = parseFloat(reservation.event.basePrice) * multiplier;
+
+    const paymentIntent = await createPaymentIntent(Math.round(amount * 100), 'mxn', {
+      reservationId,
+      eventId: reservation.eventId,
+      userId,
+    });
+
+    return res.json({
+      id: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+      amount,
+      currency: 'MXN',
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 const createPaypalOrderValidation = [
   body('reservationId').isUUID().withMessage('Valid reservation ID required'),
 ];
@@ -68,7 +117,10 @@ async function createPaypalOrder(req, res, next) {
 
     const reservation = await Reservation.findOne({
       where: { id: reservationId, userId, status: 'held' },
-      include: [{ model: Event, as: 'event' }],
+      include: [
+        { model: Event, as: 'event' },
+        { model: Seat, as: 'seat', include: [{ model: SeatType, as: 'seatType' }] },
+      ],
     });
 
     if (!reservation) {
@@ -79,7 +131,10 @@ async function createPaypalOrder(req, res, next) {
       return res.status(410).json({ error: 'Reservation has expired' });
     }
 
-    const amount = parseFloat(reservation.event.basePrice);
+    const multiplier = reservation.seat?.seatType
+      ? parseFloat(reservation.seat.seatType.multiplier)
+      : 1.0;
+    const amount = parseFloat(reservation.event.basePrice) * multiplier;
 
     const order = await createOrder(amount, 'MXN');
 
@@ -116,6 +171,8 @@ async function capturePaypalOrder(req, res, next) {
 
 module.exports = {
   stripeWebhook,
+  createStripeIntent,
+  createStripeIntentValidation,
   createPaypalOrder,
   createPaypalOrderValidation,
   capturePaypalOrder,

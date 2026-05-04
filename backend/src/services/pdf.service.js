@@ -12,6 +12,19 @@ function ensureUploadsDir() {
   }
 }
 
+function resolveLogoPath(logoUrl) {
+  if (!logoUrl || typeof logoUrl !== 'string') return null;
+  if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+    return null;
+  }
+  if (path.isAbsolute(logoUrl)) {
+    return fs.existsSync(logoUrl) ? logoUrl : null;
+  }
+  const normalized = logoUrl.startsWith('/uploads') ? logoUrl.slice(1) : logoUrl;
+  const candidate = path.join(__dirname, '../../', normalized);
+  return fs.existsSync(candidate) ? candidate : null;
+}
+
 /**
  * Generate a ticket PDF and save it to disk.
  * @param {Object} ticket - Ticket model instance
@@ -35,6 +48,13 @@ async function generateTicketPDF(ticket, event, seat, user, venue) {
 
       // Header background
       doc.rect(0, 0, doc.page.width, 80).fill('#1a1a2e');
+
+      const logoPath = resolveLogoPath(venue.logoUrl);
+      if (logoPath) {
+        try {
+          doc.image(logoPath, 30, 18, { width: 40, height: 40 });
+        } catch (_) {}
+      }
 
       // Title
       doc
@@ -104,7 +124,7 @@ async function generateTicketPDF(ticket, event, seat, user, venue) {
       yPos += 18;
 
       const seatTypeName = seat.seatType ? seat.seatType.name : 'general';
-      const seatColor = seat.seatType ? seat.seatType.color : '#808080';
+      const seatColor = seat.seatType ? seat.seatType.color : '#9E9E9E';
 
       doc.rect(leftCol, yPos, 10, 10).fill(seatColor);
       doc.font('Helvetica').fontSize(10).fillColor('#333333')

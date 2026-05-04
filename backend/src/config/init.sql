@@ -149,7 +149,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- Seed seat types
 INSERT IGNORE INTO `seat_types` (`id`, `name`, `color`, `multiplier`) VALUES
-  (UUID(), 'general',    '#808080', 1.00),
-  (UUID(), 'preferente', '#4169E1', 1.50),
-  (UUID(), 'vip',        '#FFD700', 2.50),
-  (UUID(), 'palco',      '#8B0000', 4.00);
+  (UUID(), 'general',    '#9E9E9E', 1.00),
+  (UUID(), 'preferente', '#1976D2', 1.30),
+  (UUID(), 'vip',        '#F9A825', 1.80),
+  (UUID(), 'palco',      '#7B1FA2', 2.50);
