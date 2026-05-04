@@ -63,8 +63,8 @@ let redis;
 
 beforeAll(async () => {
   try {
-    sequelize = require('./src/config/database');
-    redis = require('./src/config/redis');
+    sequelize = require('../src/config/database');
+    redis = require('../src/config/redis');
 
     await sequelize.authenticate();
     await sequelize.sync({ force: true });
@@ -77,7 +77,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   if (!sequelize) return;
   try {
-    const { Ticket, Reservation, Event, Seat, Venue, User, SeatType } = require('./src/models');
+    const { Ticket, Reservation, Event, Seat, Venue, User, SeatType } = require('../src/models');
     await Ticket.destroy({ where: {}, force: true });
     await Reservation.destroy({ where: {}, force: true });
     await Event.destroy({ where: {}, force: true });
