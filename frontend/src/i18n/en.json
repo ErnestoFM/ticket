@@ -34,10 +34,10 @@
     "cta": "Browse events",
     "featuresTitle": "Everything you need",
     "featureSeats": "Real-time seat map",
-    "featurePayments": "Secure payments with Stripe and PayPal",
+    "featurePayments": "Fast & Secure Payments",
     "featureTickets": "Digital tickets with QR and WhatsApp",
     "featureSeatsDesc": "Reserve seats in real time and secure them in minutes.",
-    "featurePaymentsDesc": "Pay safely with cards, Stripe, and PayPal.",
+    "featurePaymentsDesc": "Integrated and reliable payment processing.",
     "featureTicketsDesc": "Receive your PDF ticket with QR via WhatsApp."
   },
   "auth": {

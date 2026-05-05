@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `tickets` (
   `seat_id` CHAR(36) NOT NULL,
   `reservation_id` CHAR(36) NOT NULL,
   `price` DECIMAL(10,2) NOT NULL,
-  `payment_method` ENUM('stripe','paypal') NOT NULL,
+  `payment_method` ENUM('stripe','paypal','mock') NOT NULL,
   `payment_intent_id` VARCHAR(255) NOT NULL,
   `qr_code` TEXT DEFAULT NULL,
   `pdf_path` VARCHAR(500) DEFAULT NULL,

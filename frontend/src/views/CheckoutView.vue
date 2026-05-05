@@ -1,138 +1,63 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import { loadStripe } from '@stripe/stripe-js';
-import { loadScript } from '@paypal/paypal-js';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import api from '../api/axios';
 import { useCartStore } from '../stores/cart';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
-
 const cartStore = useCartStore();
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || '';
-const stripeEnabled = Boolean(stripeKey);
-const stripePromise = stripeEnabled ? loadStripe(stripeKey) : null;
+const router = useRouter();
 
-const cardContainer = ref(null);
-const stripeInstance = ref(null);
-const cardElement = ref(null);
 const processing = ref(false);
 const message = ref('');
 
-const paypalReady = ref(false);
-const paypalInstance = ref(null);
+const cardNumber = ref('');
+const expirationDate = ref('');
+const cvv = ref('');
 
 const selectedSeats = computed(() => cartStore.selectedSeats);
 const total = computed(() => cartStore.totalPrice);
 
-const setupStripe = async () => {
-  if (stripeInstance.value) return;
-  if (!stripeEnabled || !stripePromise) {
-    message.value = t('checkout.missingStripeKey');
+const handleMockPayment = async () => {
+  if (!cardNumber.value || !expirationDate.value || !cvv.value) {
+    message.value = t('checkout.fillAllFields', 'Por favor completa todos los campos.');
     return;
   }
-  stripeInstance.value = await stripePromise;
-  const elements = stripeInstance.value.elements();
-  cardElement.value = elements.create('card');
-  cardElement.value.mount(cardContainer.value);
-};
-
-const handleStripePayment = async () => {
-  if (!stripeEnabled) {
-    message.value = t('checkout.missingStripeKey');
-    return;
-  }
-  if (!stripeInstance.value || !cardElement.value) return;
+  
   processing.value = true;
   message.value = '';
 
   try {
     for (const reservation of selectedSeats.value) {
-      const intentRes = await api.post('/api/payments/stripe/create-intent', {
+      // 1. Proceso de cobro mockeado
+      const intentRes = await api.post('/api/payments/mock/process', {
         reservationId: reservation.reservationId,
+        cardNumber: cardNumber.value,
+        expirationDate: expirationDate.value,
+        cvv: cvv.value,
       });
 
-      const { error, paymentIntent } = await stripeInstance.value.confirmCardPayment(
-        intentRes.data.clientSecret,
-        { payment_method: { card: cardElement.value } }
-      );
-
-      if (error) throw error;
-
+      // 2. Confirmación de ticket en backend
       await api.post('/api/tickets/confirm', {
         reservationId: reservation.reservationId,
-        paymentMethod: 'stripe',
-        paymentIntentId: paymentIntent.id,
+        paymentMethod: 'mock',
+        paymentIntentId: intentRes.data.paymentIntentId,
       });
 
       cartStore.removeSeat(reservation.reservationId);
     }
 
     message.value = t('checkout.success');
+    setTimeout(() => {
+      router.push('/my-tickets');
+    }, 2000);
   } catch (err) {
     message.value = err?.response?.data?.error || err.message || t('checkout.error');
   } finally {
     processing.value = false;
   }
 };
-
-const ensurePayPal = async () => {
-  if (paypalReady.value) return;
-  if (!import.meta.env.VITE_PAYPAL_CLIENT_ID) return;
-  paypalInstance.value = await loadScript({
-    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
-    currency: 'MXN',
-    intent: 'capture',
-  });
-  paypalReady.value = true;
-};
-
-const renderPayPalButtons = async () => {
-  await ensurePayPal();
-  if (!paypalInstance.value) return;
-
-  selectedSeats.value.forEach((reservation) => {
-    const containerId = `paypal-button-${reservation.reservationId}`;
-    const container = document.getElementById(containerId);
-    if (!container || container.dataset.rendered) return;
-
-    paypalInstance.value.Buttons({
-      createOrder: async () => {
-        const response = await api.post('/api/payments/paypal/create-order', {
-          reservationId: reservation.reservationId,
-        });
-        return response.data.orderId;
-      },
-      onApprove: async (data) => {
-        await api.post('/api/payments/paypal/capture-order', { orderId: data.orderID });
-        await api.post('/api/tickets/confirm', {
-          reservationId: reservation.reservationId,
-          paymentMethod: 'paypal',
-          paymentIntentId: data.orderID,
-        });
-        cartStore.removeSeat(reservation.reservationId);
-      },
-      onError: (err) => {
-        message.value = err.message || t('checkout.paypalError');
-      },
-    }).render(`#${containerId}`);
-
-    container.dataset.rendered = 'true';
-  });
-};
-
-onMounted(async () => {
-  if (!stripeEnabled) {
-    message.value = t('checkout.missingStripeKey');
-  } else {
-    await setupStripe();
-  }
-  await renderPayPalButtons();
-});
-
-watch(selectedSeats, async () => {
-  await renderPayPalButtons();
-});
 </script>
 
 <template>
@@ -148,26 +73,81 @@ watch(selectedSeats, async () => {
         </ul>
         <p class="total-row">{{ $t('checkout.total') }}: ${{ total.toFixed(2) }}</p>
       </div>
+      
       <div class="payment-panel">
-        <h3>{{ $t('checkout.payWithCard') }}</h3>
-        <div ref="cardContainer" class="card-element"></div>
-        <button class="primary" :disabled="processing || !selectedSeats.length" @click="handleStripePayment">
-          {{ processing ? $t('checkout.processing') : $t('checkout.confirm') }}
-        </button>
-        <p v-if="message" class="status">{{ message }}</p>
-
-        <div v-if="selectedSeats.length" class="paypal-section">
-          <h3>{{ $t('checkout.payWithPaypal') }}</h3>
-          <div
-            v-for="item in selectedSeats"
-            :key="item.reservationId"
-            class="paypal-item"
-          >
-            <p>{{ item.seat.label }} · {{ item.price.toFixed(2) }}</p>
-            <div :id="`paypal-button-${item.reservationId}`"></div>
+        <h3>Pago con Tarjeta</h3>
+        <form @submit.prevent="handleMockPayment" class="mock-payment-form">
+          <div class="form-group">
+            <label>Número de Tarjeta (16 dígitos)</label>
+            <input 
+              v-model="cardNumber" 
+              type="text" 
+              maxlength="16" 
+              placeholder="1234567812345678" 
+              required
+              pattern="\d{16}"
+            />
           </div>
-        </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Vencimiento (MM/YY)</label>
+              <input 
+                v-model="expirationDate" 
+                type="text" 
+                maxlength="5" 
+                placeholder="12/25" 
+                required
+                pattern="(0[1-9]|1[0-2])\/\d{2}"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label>CVV</label>
+              <input 
+                v-model="cvv" 
+                type="text" 
+                maxlength="4" 
+                placeholder="123" 
+                required
+                pattern="\d{3,4}"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="primary" :disabled="processing || !selectedSeats.length">
+            {{ processing ? 'Procesando...' : $t('checkout.confirm') }}
+          </button>
+        </form>
+        
+        <p v-if="message" class="status">{{ message }}</p>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+.mock-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+.form-row .form-group {
+  flex: 1;
+}
+input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>

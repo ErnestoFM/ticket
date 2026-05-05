@@ -5,25 +5,11 @@ const { app } = require('../../src/index');
 const { User, Venue, SeatType, Seat, Event, Reservation } = require('../../src/models');
 const { v4: uuidv4 } = require('uuid');
 const { generateAccessToken } = require('../../src/utils/jwt.utils');
-const { constructWebhookEvent } = require('../../src/services/stripe.service');
 
-// Mock Stripe webhook
-jest.mock('../../src/services/stripe.service', () => ({
-  createPaymentIntent: jest.fn().mockResolvedValue({ id: 'pi_test', client_secret: 'secret' }),
-  confirmPaymentIntent: jest.fn().mockResolvedValue({ id: 'pi_test', status: 'succeeded' }),
-  constructWebhookEvent: jest.fn(),
-}));
-
-// Mock PayPal
-jest.mock('../../src/services/paypal.service', () => ({
-  createOrder: jest.fn().mockResolvedValue({
-    id: 'PAYPAL_ORDER_123',
-    status: 'CREATED',
-    links: [{ rel: 'approve', href: 'https://sandbox.paypal.com/approve/123' }],
-  }),
-  captureOrder: jest.fn().mockResolvedValue({
-    id: 'PAYPAL_ORDER_123',
-    status: 'COMPLETED',
+jest.mock('../../src/services/mockPayment.service', () => ({
+  processPayment: jest.fn().mockResolvedValue({
+    success: true,
+    paymentIntentId: 'mock_pi_123'
   }),
 }));
 
@@ -111,7 +97,7 @@ async function seedPaymentTestData() {
   }
 }
 
-describe('Payment Integration Tests', () => {
+describe('Mock Payment Integration Tests', () => {
   let testData;
   let userToken;
 
@@ -122,131 +108,51 @@ describe('Payment Integration Tests', () => {
     }
   });
 
-  describe('POST /api/payments/stripe/webhook', () => {
-    test('returns 400 without stripe-signature header', async () => {
-      const res = await request(app)
-        .post('/api/payments/stripe/webhook')
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ type: 'payment_intent.succeeded' }));
-
-      expect(res.status).toBe(400);
-    });
-
-    test('returns 400 for invalid stripe signature', async () => {
-      const { constructWebhookEvent } = require('../../src/services/stripe.service');
-      constructWebhookEvent.mockImplementationOnce(() => {
-        throw new Error('Signature mismatch');
-      });
-
-      const res = await request(app)
-        .post('/api/payments/stripe/webhook')
-        .set('stripe-signature', 'invalid_sig')
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ type: 'test' }));
-
-      expect(res.status).toBe(400);
-    });
-
-    test('handles payment_intent.succeeded webhook', async () => {
-      const { constructWebhookEvent } = require('../../src/services/stripe.service');
-      constructWebhookEvent.mockImplementationOnce(() => ({
-        type: 'payment_intent.succeeded',
-        data: { object: { id: 'pi_test_webhook', status: 'succeeded' } },
-      }));
-
-      const res = await request(app)
-        .post('/api/payments/stripe/webhook')
-        .set('stripe-signature', 'valid_test_sig')
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ type: 'payment_intent.succeeded' }));
-
-      expect([200, 400]).toContain(res.status);
-      if (res.status === 200) {
-        expect(res.body.received).toBe(true);
-      }
-    });
-  });
-
-  describe('POST /api/payments/paypal/create-order', () => {
+  describe('POST /api/payments/mock/process', () => {
     test('returns 401 without auth', async () => {
       const res = await request(app)
-        .post('/api/payments/paypal/create-order')
+        .post('/api/payments/mock/process')
         .send({ reservationId: uuidv4() });
 
       expect(res.status).toBe(401);
     });
 
-    test('returns 422 for missing reservationId', async () => {
+    test('returns 422 for missing fields', async () => {
       if (!testData) {
         console.warn('Skipping - DB not available');
         return;
       }
 
       const res = await request(app)
-        .post('/api/payments/paypal/create-order')
+        .post('/api/payments/mock/process')
         .set('Cookie', [`access_token=${userToken}`])
-        .send({});
+        .send({
+          reservationId: testData.reservation.id
+        });
 
       expect(res.status).toBe(422);
     });
 
-    test('creates PayPal order for valid reservation', async () => {
+    test('processes mock payment for valid reservation', async () => {
       if (!testData) {
         console.warn('Skipping - DB not available');
         return;
       }
 
       const res = await request(app)
-        .post('/api/payments/paypal/create-order')
+        .post('/api/payments/mock/process')
         .set('Cookie', [`access_token=${userToken}`])
-        .send({ reservationId: testData.reservation.id });
+        .send({ 
+          reservationId: testData.reservation.id,
+          cardNumber: '1234567812345678',
+          expirationDate: '12/25',
+          cvv: '123'
+        });
 
       expect([200, 404, 500]).toContain(res.status);
       if (res.status === 200) {
-        expect(res.body).toHaveProperty('orderId');
-        expect(res.body.orderId).toBe('PAYPAL_ORDER_123');
-      }
-    });
-  });
-
-  describe('POST /api/payments/paypal/capture-order', () => {
-    test('returns 401 without auth', async () => {
-      const res = await request(app)
-        .post('/api/payments/paypal/capture-order')
-        .send({ orderId: 'PAYPAL_ORDER_123' });
-
-      expect(res.status).toBe(401);
-    });
-
-    test('returns 422 for missing orderId', async () => {
-      if (!testData) {
-        console.warn('Skipping - DB not available');
-        return;
-      }
-
-      const res = await request(app)
-        .post('/api/payments/paypal/capture-order')
-        .set('Cookie', [`access_token=${userToken}`])
-        .send({});
-
-      expect(res.status).toBe(422);
-    });
-
-    test('captures PayPal order', async () => {
-      if (!testData) {
-        console.warn('Skipping - DB not available');
-        return;
-      }
-
-      const res = await request(app)
-        .post('/api/payments/paypal/capture-order')
-        .set('Cookie', [`access_token=${userToken}`])
-        .send({ orderId: 'PAYPAL_ORDER_123' });
-
-      expect([200, 402, 500]).toContain(res.status);
-      if (res.status === 200) {
-        expect(res.body).toHaveProperty('captureId');
-        expect(res.body.status).toBe('COMPLETED');
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body).toHaveProperty('paymentIntentId', 'mock_pi_123');
       }
     });
   });

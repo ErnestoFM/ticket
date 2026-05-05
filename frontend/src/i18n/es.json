@@ -34,10 +34,10 @@
     "cta": "Explorar eventos",
     "featuresTitle": "Todo lo que necesitas",
     "featureSeats": "Mapa de asientos en tiempo real",
-    "featurePayments": "Pagos seguros con Stripe y PayPal",
+    "featurePayments": "Pagos Seguros y Rápidos",
     "featureTickets": "Boletos digitales con QR y WhatsApp",
     "featureSeatsDesc": "Reserva asientos en tiempo real y asegúralos en minutos.",
-    "featurePaymentsDesc": "Pagos con tarjeta, Stripe y PayPal de forma segura.",
+    "featurePaymentsDesc": "Procesamiento de pagos integrados y fiables.",
     "featureTicketsDesc": "Recibe tu boleto en PDF con QR vía WhatsApp."
   },
   "auth": {

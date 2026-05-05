@@ -15,11 +15,7 @@ process.env.JWT_REFRESH_EXPIRES = '7d';
 process.env.TWILIO_ACCOUNT_SID = 'ACtest';
 process.env.TWILIO_AUTH_TOKEN = 'test_token';
 process.env.TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886';
-process.env.STRIPE_SECRET_KEY = 'sk_test_dummy';
-process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
-process.env.PAYPAL_CLIENT_ID = 'test_paypal_client';
-process.env.PAYPAL_CLIENT_SECRET = 'test_paypal_secret';
-process.env.PAYPAL_MODE = 'sandbox';
+
 process.env.FRONTEND_URL = 'http://localhost:5173';
 process.env.PORT = '3001';
 process.env.RESERVATION_TTL = '60';

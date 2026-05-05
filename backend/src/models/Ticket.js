@@ -37,7 +37,7 @@ const Ticket = sequelize.define('Ticket', {
     validate: { min: 0 },
   },
   paymentMethod: {
-    type: DataTypes.ENUM('stripe', 'paypal'),
+    type: DataTypes.ENUM('stripe', 'paypal', 'mock'),
     allowNull: false,
     field: 'payment_method',
   },

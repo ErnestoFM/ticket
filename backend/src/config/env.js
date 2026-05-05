@@ -36,15 +36,6 @@ module.exports = {
     authToken: process.env.TWILIO_AUTH_TOKEN || '',
     whatsappFrom: process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886',
   },
-  stripe: {
-    secretKey: process.env.STRIPE_SECRET_KEY || '',
-    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-  },
-  paypal: {
-    clientId: process.env.PAYPAL_CLIENT_ID || '',
-    clientSecret: process.env.PAYPAL_CLIENT_SECRET || '',
-    mode: process.env.PAYPAL_MODE || 'sandbox',
-  },
   app: {
     port: parseInt(process.env.PORT || '3000', 10),
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',

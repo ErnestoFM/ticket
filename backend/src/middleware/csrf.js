@@ -14,10 +14,7 @@ function csrfProtection(req, res, next) {
     return next();
   }
 
-  // Stripe webhook uses a raw body + signature - skip CSRF for it
-  if (req.path === '/api/payments/stripe/webhook') {
-    return next();
-  }
+
 
   const origin = req.headers.origin || req.headers.referer;
 

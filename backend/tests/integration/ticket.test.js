@@ -7,32 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const { generateAccessToken } = require('../../src/utils/jwt.utils');
 const redis = require('../../src/config/redis');
 
-// Mock Stripe for payment confirmation
-jest.mock('../../src/services/stripe.service', () => ({
-  createPaymentIntent: jest.fn().mockResolvedValue({
-    id: 'pi_test_123',
-    client_secret: 'pi_test_secret',
-    status: 'requires_payment_method',
-  }),
-  confirmPaymentIntent: jest.fn().mockResolvedValue({
-    id: 'pi_test_123',
-    status: 'succeeded',
-  }),
-  constructWebhookEvent: jest.fn(),
-}));
-
-// Mock PayPal
-jest.mock('../../src/services/paypal.service', () => ({
-  createOrder: jest.fn().mockResolvedValue({
-    id: 'PAYPAL_ORDER_TEST',
-    status: 'CREATED',
-    links: [{ rel: 'approve', href: 'https://sandbox.paypal.com/approve' }],
-  }),
-  captureOrder: jest.fn().mockResolvedValue({
-    id: 'PAYPAL_ORDER_TEST',
-    status: 'COMPLETED',
-  }),
-}));
+// Removed stripe and paypal mocks
 
 // Mock QR generation
 jest.mock('../../src/utils/qr.utils', () => ({
@@ -167,7 +142,7 @@ describe('Ticket Integration Tests', () => {
         .post('/api/tickets/confirm')
         .send({
           reservationId: uuidv4(),
-          paymentMethod: 'stripe',
+          paymentMethod: 'mock',
           paymentIntentId: 'pi_test_123',
         });
 
@@ -227,15 +202,15 @@ describe('Ticket Integration Tests', () => {
         .set('Cookie', [`access_token=${userToken}`])
         .send({
           reservationId,
-          paymentMethod: 'stripe',
+          paymentMethod: 'mock',
           paymentIntentId: 'pi_test_123',
         });
 
       expect([201, 404, 410, 500]).toContain(confirmRes.status);
       if (confirmRes.status === 201) {
         expect(confirmRes.body).toHaveProperty('ticket');
-        expect(confirmRes.body.ticket).toHaveProperty('id');
-        expect(confirmRes.body.ticket.paymentMethod).toBe('stripe');
+        expect(confirmRes.body.ticket.id).toBeDefined();
+        expect(confirmRes.body.ticket.paymentMethod).toBe('mock');
       }
     });
   });

@@ -4,8 +4,6 @@ const { body, validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 const { Ticket, Reservation, Event, Seat, SeatType, Venue, User } = require('../models');
 const { confirmReservation } = require('../services/reservation.service');
-const { confirmPaymentIntent } = require('../services/stripe.service');
-const { captureOrder } = require('../services/paypal.service');
 const { generateQR } = require('../utils/qr.utils');
 const { generateTicketPDF } = require('../services/pdf.service');
 const { sendTicketWhatsApp } = require('../services/whatsapp.service');
@@ -23,8 +21,8 @@ function handleValidation(req, res) {
 
 const confirmValidation = [
   body('reservationId').isUUID().withMessage('Valid reservation ID required'),
-  body('paymentMethod').isIn(['stripe', 'paypal']).withMessage('Payment method must be stripe or paypal'),
-  body('paymentIntentId').trim().notEmpty().withMessage('Payment intent/order ID required'),
+  body('paymentMethod').isIn(['mock']).withMessage('Payment method must be mock'),
+  body('paymentIntentId').trim().notEmpty().withMessage('Payment intent ID required'),
 ];
 
 async function confirm(req, res, next) {
@@ -38,10 +36,8 @@ async function confirm(req, res, next) {
     const reservation = await confirmReservation(reservationId, userId);
 
     // Verify payment
-    if (paymentMethod === 'stripe') {
-      await confirmPaymentIntent(paymentIntentId);
-    } else if (paymentMethod === 'paypal') {
-      await captureOrder(paymentIntentId);
+    if (paymentMethod !== 'mock') {
+      return res.status(400).json({ error: 'Invalid payment method' });
     }
 
     // Fetch related data
