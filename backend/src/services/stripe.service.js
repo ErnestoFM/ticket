@@ -20,7 +20,7 @@ async function createPaymentIntent(amount, currency = 'mxn', metadata = {}) {
     amount: Math.round(amount),
     currency,
     metadata,
-    automatic_payment_methods: { enabled: true },
+    payment_method_types: ['card'],
   });
   return paymentIntent;
 }

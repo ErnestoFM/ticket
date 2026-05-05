@@ -10,6 +10,7 @@ const { generateQR } = require('../utils/qr.utils');
 const { generateTicketPDF } = require('../services/pdf.service');
 const { sendTicketWhatsApp } = require('../services/whatsapp.service');
 const env = require('../config/env');
+const jwt = require('jsonwebtoken');
 
 function handleValidation(req, res) {
   const errors = validationResult(req);
@@ -56,16 +57,6 @@ async function confirm(req, res, next) {
     const multiplier = seat.seatType ? parseFloat(seat.seatType.multiplier) : 1.0;
     const price = parseFloat(event.basePrice) * multiplier;
 
-    // Generate QR code
-    const qrData = JSON.stringify({
-      ticketId: uuidv4(),
-      eventId: event.id,
-      seatId: seat.id,
-      userId,
-      reservationId,
-    });
-    const qrCode = await generateQR(qrData);
-
     // Create ticket
     const ticket = await Ticket.create({
       userId,
@@ -75,13 +66,27 @@ async function confirm(req, res, next) {
       price,
       paymentMethod,
       paymentIntentId,
-      qrCode,
+      qrCode: null,
     });
+
+    const qrPayload = jwt.sign(
+      {
+        ticketId: ticket.id,
+        curp: user.curp,
+        eventId: event.id,
+        seatId: seat.id,
+      },
+      env.jwt.secret,
+      { issuer: 'ticketmaster-mx' }
+    );
+
+    const qrCode = await generateQR(qrPayload);
+    await ticket.update({ qrCode });
 
     // Generate PDF
     let pdfPath = null;
     try {
-      pdfPath = await generateTicketPDF(ticket, event, seat, user, event.venue);
+      pdfPath = await generateTicketPDF({ ...ticket.toJSON(), qrCode }, event, seat, user, event.venue);
       await ticket.update({ pdfPath });
     } catch (pdfErr) {
       console.error('[TicketController] PDF generation failed:', pdfErr.message);
@@ -94,7 +99,7 @@ async function confirm(req, res, next) {
     }
 
     try {
-      await sendTicketWhatsApp({ ...ticket.toJSON(), seat }, user, event, pdfUrl);
+      await sendTicketWhatsApp({ ...ticket.toJSON(), seat, qrCode }, user, event, pdfUrl);
       await ticket.update({ whatsappSent: true });
     } catch (waErr) {
       console.error('[TicketController] WhatsApp send failed:', waErr.message);

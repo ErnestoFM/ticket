@@ -19,8 +19,10 @@ const authRoutes = require('./routes/auth.routes');
 const eventRoutes = require('./routes/event.routes');
 const venueRoutes = require('./routes/venue.routes');
 const seatRoutes = require('./routes/seat.routes');
+const reservationRoutes = require('./routes/reservation.routes');
 const ticketRoutes = require('./routes/ticket.routes');
 const paymentRoutes = require('./routes/payment.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
 
@@ -67,8 +69,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/venues', venueRoutes);
 app.use('/api/seats', seatRoutes);
+app.use('/api/reservations', reservationRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -5,6 +5,7 @@ const express = require('express');
 const authMiddleware = require('../middleware/auth');
 const {
   stripeWebhook,
+  createStripeIntent, createStripeIntentValidation,
   createPaypalOrder, createPaypalOrderValidation,
   capturePaypalOrder, capturePaypalOrderValidation,
 } = require('../controllers/payment.controller');
@@ -17,6 +18,7 @@ router.post(
   express.raw({ type: 'application/json' }),
   stripeWebhook
 );
+router.post('/stripe/create-intent', authMiddleware, createStripeIntentValidation, createStripeIntent);
 
 router.post('/paypal/create-order', authMiddleware, createPaypalOrderValidation, createPaypalOrder);
 router.post('/paypal/capture-order', authMiddleware, capturePaypalOrderValidation, capturePaypalOrder);
