@@ -12,17 +12,26 @@ const router = useRouter();
 const processing = ref(false);
 const message = ref('');
 
+const paymentMethod = ref('mock'); // 'mock' = Tarjeta, 'paypal' = PayPal
 const cardNumber = ref('');
 const expirationDate = ref('');
 const cvv = ref('');
+const paypalEmail = ref('');
 
 const selectedSeats = computed(() => cartStore.selectedSeats);
 const total = computed(() => cartStore.totalPrice);
 
 const handleMockPayment = async () => {
-  if (!cardNumber.value || !expirationDate.value || !cvv.value) {
-    message.value = t('checkout.fillAllFields', 'Por favor completa todos los campos.');
-    return;
+  if (paymentMethod.value === 'mock') {
+    if (!cardNumber.value || !expirationDate.value || !cvv.value) {
+      message.value = 'Por favor completa todos los campos de la tarjeta.';
+      return;
+    }
+  } else if (paymentMethod.value === 'paypal') {
+    if (!paypalEmail.value) {
+      message.value = 'Por favor ingresa tu correo de PayPal.';
+      return;
+    }
   }
   
   processing.value = true;
@@ -33,15 +42,12 @@ const handleMockPayment = async () => {
       // 1. Proceso de cobro mockeado
       const intentRes = await api.post('/api/payments/mock/process', {
         reservationId: reservation.reservationId,
-        cardNumber: cardNumber.value,
-        expirationDate: expirationDate.value,
-        cvv: cvv.value,
       });
 
       // 2. Confirmación de ticket en backend
       await api.post('/api/tickets/confirm', {
         reservationId: reservation.reservationId,
-        paymentMethod: 'mock',
+        paymentMethod: paymentMethod.value, // Envía 'mock' o 'paypal' a la BD
         paymentIntentId: intentRes.data.paymentIntentId,
       });
 
@@ -50,7 +56,7 @@ const handleMockPayment = async () => {
 
     message.value = t('checkout.success');
     setTimeout(() => {
-      router.push('/my-tickets');
+      router.push('/tickets');
     }, 2000);
   } catch (err) {
     message.value = err?.response?.data?.error || err.message || t('checkout.error');
@@ -74,64 +80,122 @@ const handleMockPayment = async () => {
         <p class="total-row">{{ $t('checkout.total') }}: ${{ total.toFixed(2) }}</p>
       </div>
       
-      <div class="payment-panel">
-        <h3>Pago con Tarjeta</h3>
+      <div class="payment-panel glass-card">
+        <h3>Método de Pago</h3>
+        
+        <div class="payment-method-selector">
+          <label>
+            <input type="radio" value="mock" v-model="paymentMethod" />
+            Tarjeta de Crédito / Débito
+          </label>
+          <label>
+            <input type="radio" value="paypal" v-model="paymentMethod" />
+            PayPal
+          </label>
+        </div>
+
         <form @submit.prevent="handleMockPayment" class="mock-payment-form">
-          <div class="form-group">
-            <label>Número de Tarjeta (16 dígitos)</label>
-            <input 
-              v-model="cardNumber" 
-              type="text" 
-              maxlength="16" 
-              placeholder="1234567812345678" 
-              required
-              pattern="\d{16}"
-            />
-          </div>
-          
-          <div class="form-row">
+          <!-- Card Payment Fields -->
+          <template v-if="paymentMethod === 'mock'">
             <div class="form-group">
-              <label>Vencimiento (MM/YY)</label>
+              <label>Número de Tarjeta (16 dígitos)</label>
               <input 
-                v-model="expirationDate" 
+                v-model="cardNumber" 
                 type="text" 
-                maxlength="5" 
-                placeholder="12/25" 
-                required
-                pattern="(0[1-9]|1[0-2])\/\d{2}"
+                maxlength="16" 
+                placeholder="1234567812345678" 
+                :required="paymentMethod === 'mock'"
+                pattern="\d{16}"
               />
             </div>
             
+            <div class="form-row">
+              <div class="form-group">
+                <label>Vencimiento (MM/YY)</label>
+                <input 
+                  v-model="expirationDate" 
+                  type="text" 
+                  maxlength="5" 
+                  placeholder="12/25" 
+                  :required="paymentMethod === 'mock'"
+                  pattern="(0[1-9]|1[0-2])\/\d{2}"
+                />
+              </div>
+              
+              <div class="form-group">
+                <label>CVV</label>
+                <input 
+                  v-model="cvv" 
+                  type="text" 
+                  maxlength="4" 
+                  placeholder="123" 
+                  :required="paymentMethod === 'mock'"
+                  pattern="\d{3,4}"
+                />
+              </div>
+            </div>
+          </template>
+
+          <!-- PayPal Payment Fields -->
+          <template v-if="paymentMethod === 'paypal'">
             <div class="form-group">
-              <label>CVV</label>
+              <label>Correo electrónico de PayPal</label>
               <input 
-                v-model="cvv" 
-                type="text" 
-                maxlength="4" 
-                placeholder="123" 
-                required
-                pattern="\d{3,4}"
+                v-model="paypalEmail" 
+                type="email" 
+                placeholder="tu@correo.com" 
+                :required="paymentMethod === 'paypal'"
               />
             </div>
-          </div>
+            <div class="paypal-info">
+              <p class="muted">Serás redirigido virtualmente a PayPal. Para esta demostración, la compra se procesará automáticamente.</p>
+            </div>
+          </template>
 
           <button type="submit" class="primary" :disabled="processing || !selectedSeats.length">
-            {{ processing ? 'Procesando...' : $t('checkout.confirm') }}
+            {{ processing ? 'Procesando...' : (paymentMethod === 'mock' ? $t('checkout.confirm') : 'Pagar con PayPal') }}
           </button>
         </form>
         
-        <p v-if="message" class="status">{{ message }}</p>
+        <p v-if="message" class="status" :class="{ 'error': message !== $t('checkout.success') }">{{ message }}</p>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+}
+.payment-method-selector {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-top: 1rem;
+}
+.payment-method-selector label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text);
+}
+.payment-method-selector input[type="radio"] {
+  accent-color: var(--primary);
+  width: 18px;
+  height: 18px;
+}
 .mock-payment-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
 }
 .form-group {
   display: flex;
@@ -147,7 +211,31 @@ const handleMockPayment = async () => {
 }
 input {
   padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+  color: var(--text);
+  font-family: inherit;
+}
+input:focus {
+  outline: 2px solid var(--primary);
+  border-color: transparent;
+}
+.paypal-info {
+  background: rgba(0, 112, 186, 0.1);
+  border: 1px solid rgba(0, 112, 186, 0.3);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  color: #c2e0ff;
+}
+.status {
+  margin-top: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--success);
+}
+.status.error {
+  color: var(--danger);
 }
 </style>

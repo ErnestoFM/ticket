@@ -26,6 +26,20 @@ const fetchTickets = async () => {
 
 const pdfUrl = (ticket) => `${apiBase}/uploads/tickets/${ticket.id}.pdf`;
 
+const resending = ref({});
+
+const resendWhatsapp = async (ticket) => {
+  resending.value[ticket.id] = true;
+  try {
+    await api.post(`/api/tickets/${ticket.id}/resend-whatsapp`);
+    alert('Boleto reenviado por WhatsApp exitosamente');
+  } catch (err) {
+    alert(err.response?.data?.error || 'Error al reenviar el boleto por WhatsApp');
+  } finally {
+    resending.value[ticket.id] = false;
+  }
+};
+
 onMounted(fetchTickets);
 </script>
 
@@ -47,10 +61,40 @@ onMounted(fetchTickets);
         <p>{{ $t('tickets.venue') }}: {{ ticket.event?.venue?.name || '—' }}</p>
         <p>{{ $t('tickets.seat') }}: {{ ticket.seat?.label || '—' }} · {{ ticket.seat?.seatType?.name?.toUpperCase() }}</p>
         <p>{{ $t('tickets.price') }}: ${{ Number(ticket.price || 0).toFixed(2) }}</p>
-        <a class="primary" :href="pdfUrl(ticket)" target="_blank" rel="noopener">
-          {{ $t('tickets.view') }}
-        </a>
+        <div class="ticket-actions">
+          <a class="primary" :href="pdfUrl(ticket)" target="_blank" rel="noopener">
+            {{ $t('tickets.view') }}
+          </a>
+          <button class="whatsapp-btn" @click="resendWhatsapp(ticket)" :disabled="resending[ticket.id]">
+            {{ resending[ticket.id] ? 'Enviando...' : 'Reenviar WhatsApp' }}
+          </button>
+        </div>
       </article>
     </div>
   </section>
 </template>
+
+<style scoped>
+.ticket-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.whatsapp-btn {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.whatsapp-btn:hover {
+  opacity: 0.9;
+}
+.whatsapp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

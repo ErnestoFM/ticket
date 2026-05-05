@@ -7,6 +7,7 @@ const { processPayment } = require('../services/mockPayment.service');
 function handleValidation(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error('Validation failed:', errors.array());
     res.status(422).json({ error: 'Validation failed', details: errors.array() });
     return false;
   }
@@ -15,9 +16,9 @@ function handleValidation(req, res) {
 
 const processMockPaymentValidation = [
   body('reservationId').isUUID().withMessage('Valid reservation ID required'),
-  body('cardNumber').isString().isLength({ min: 16, max: 16 }).withMessage('16-digit card number required'),
-  body('expirationDate').isString().matches(/^(0[1-9]|1[0-2])\/\d{2}$/).withMessage('Valid expiration date required (MM/YY)'),
-  body('cvv').isString().isLength({ min: 3, max: 4 }).withMessage('Valid CVV required'),
+  body('cardNumber').optional({ checkFalsy: true }).isString().isLength({ min: 16, max: 16 }).withMessage('16-digit card number required'),
+  body('expirationDate').optional({ checkFalsy: true }).isString().matches(/^(0[1-9]|1[0-2])\/\d{2}$/).withMessage('Valid expiration date required (MM/YY)'),
+  body('cvv').optional({ checkFalsy: true }).isString().isLength({ min: 3, max: 4 }).withMessage('Valid CVV required'),
 ];
 
 async function processMockPayment(req, res, next) {

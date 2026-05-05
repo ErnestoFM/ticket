@@ -19,6 +19,7 @@ const { t } = useI18n();
 const eventId = computed(() => route.params.id);
 const timeLeft = ref('00:00');
 const showExpiredModal = ref(false);
+const showLimitModal = ref(false);
 const zoom = ref(1);
 
 let pollingTimer;
@@ -69,7 +70,7 @@ const toggleSeat = async (seat) => {
   }
 
   if (cartStore.selectedSeats.length >= eventStore.currentEvent.maxTicketsPerUser) {
-    cartStore.lastError = t('seatMap.selectionLimit');
+    showLimitModal.value = true;
     return;
   }
 
@@ -140,9 +141,17 @@ onUnmounted(() => {
     </div>
 
     <div v-if="showExpiredModal" class="modal">
-      <div class="modal-content">
+      <div class="modal-content glass-card">
         <p>{{ $t('seatMap.releaseNotice') }}</p>
         <button class="primary" @click="showExpiredModal = false">{{ $t('common.close') }}</button>
+      </div>
+    </div>
+
+    <div v-if="showLimitModal" class="modal">
+      <div class="modal-content glass-card">
+        <h3 style="margin-bottom: 16px; color: var(--danger);">Límite Alcanzado</h3>
+        <p style="margin-bottom: 24px;">Has alcanzado el límite máximo de {{ eventStore.currentEvent?.maxTicketsPerUser }} boletos por persona para este evento.</p>
+        <button class="primary" @click="showLimitModal = false">{{ $t('common.close') }}</button>
       </div>
     </div>
   </section>

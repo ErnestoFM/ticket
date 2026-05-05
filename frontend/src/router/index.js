@@ -10,6 +10,15 @@ const routes = [
   { path: '/events/:id/seats', name: 'seat-selection', component: () => import('../views/SeatSelectionView.vue'), meta: { requiresAuth: true } },
   { path: '/checkout', name: 'checkout', component: () => import('../views/CheckoutView.vue'), meta: { requiresAuth: true } },
   { path: '/tickets', name: 'tickets', component: () => import('../views/MyTicketsView.vue'), meta: { requiresAuth: true } },
+  { path: '/profile', name: 'profile', component: () => import('../views/ProfileView.vue'), meta: { requiresAuth: true } },
+  { path: '/about', component: () => import('../views/StaticPageView.vue') },
+  { path: '/careers', component: () => import('../views/StaticPageView.vue') },
+  { path: '/blog', component: () => import('../views/StaticPageView.vue') },
+  { path: '/support', component: () => import('../views/StaticPageView.vue') },
+  { path: '/faq', component: () => import('../views/StaticPageView.vue') },
+  { path: '/points', component: () => import('../views/StaticPageView.vue') },
+  { path: '/terms', component: () => import('../views/StaticPageView.vue') },
+  { path: '/privacy', component: () => import('../views/StaticPageView.vue') },
   {
     path: '/admin',
     name: 'admin',
@@ -39,6 +48,11 @@ const routes = [
     name: 'admin-reports',
     component: () => import('../views/admin/AdminReports.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/NotFoundView.vue'),
   },
 ];
 

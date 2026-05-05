@@ -96,7 +96,7 @@ const submit = async () => {
     generatedCurp.value = response.curp;
     
     setTimeout(() => {
-      router.push('/login');
+      router.push({ path: '/login', query: { curp: generatedCurp.value } });
     }, 3000);
   } catch (_) {
     formError.value = authStore.error;

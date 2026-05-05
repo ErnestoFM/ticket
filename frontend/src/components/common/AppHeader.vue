@@ -9,9 +9,14 @@ const router = useRouter();
 
 const isAdmin = computed(() => authStore.user?.role === 'admin');
 const isDropdownOpen = ref(false);
+const isMobileMenuOpen = ref(false);
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
 };
 
 const closeDropdown = (e) => {
@@ -36,29 +41,49 @@ const logout = async () => {
 
 <template>
   <header class="app-header">
-    <div class="logo">{{ $t('common.brand') }}</div>
-    <nav class="nav-links">
-      <router-link to="/">{{ $t('nav.home') }}</router-link>
-      <router-link to="/events">{{ $t('nav.events') }}</router-link>
-      <router-link v-if="authStore.isAuthenticated" to="/tickets">{{ $t('nav.tickets') }}</router-link>
-      <router-link v-if="isAdmin" to="/admin">{{ $t('nav.admin') }}</router-link>
+    <div class="logo" tabindex="0">{{ $t('common.brand') }}</div>
+    
+    <button 
+      class="hamburger" 
+      @click="toggleMobileMenu" 
+      :aria-expanded="isMobileMenuOpen"
+      aria-label="Alternar menú de navegación"
+      aria-controls="main-nav"
+    >
+      ☰
+    </button>
+    
+    <nav id="main-nav" class="nav-links" :class="{ 'mobile-open': isMobileMenuOpen }" aria-label="Navegación principal">
+      <router-link to="/" @click="isMobileMenuOpen = false">Inicio</router-link>
+      <router-link to="/events" @click="isMobileMenuOpen = false">Todos los Eventos</router-link>
+      <router-link to="/events?type=teatro" @click="isMobileMenuOpen = false">Teatro</router-link>
+      <router-link to="/events?type=cine" @click="isMobileMenuOpen = false">Cine</router-link>
+      <router-link to="/events?type=museo" @click="isMobileMenuOpen = false">Museo</router-link>
+      <router-link v-if="isAdmin" to="/admin" @click="isMobileMenuOpen = false">Admin</router-link>
     </nav>
-    <div class="nav-actions">
+
+    <div class="nav-actions" :class="{ 'mobile-open': isMobileMenuOpen }">
       <LanguageSwitcher />
-      <router-link v-if="!authStore.isAuthenticated" to="/login">{{ $t('nav.login') }}</router-link>
-      <router-link v-if="!authStore.isAuthenticated" to="/register">{{ $t('nav.register') }}</router-link>
+      <router-link v-if="!authStore.isAuthenticated" to="/login" @click="isMobileMenuOpen = false">Ingresar</router-link>
+      <router-link v-if="!authStore.isAuthenticated" to="/register" @click="isMobileMenuOpen = false">Registro</router-link>
       
       <div v-if="authStore.isAuthenticated" class="user-menu">
-        <button class="user-button" @click="toggleDropdown">
+        <button 
+          class="user-button" 
+          @click="toggleDropdown"
+          :aria-expanded="isDropdownOpen"
+          aria-haspopup="true"
+          aria-label="Menú de usuario"
+        >
           {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
-          <span class="chevron">▼</span>
+          <span class="chevron" aria-hidden="true">▼</span>
         </button>
-        <div v-if="isDropdownOpen" class="dropdown">
-          <router-link to="/profile" @click="isDropdownOpen = false">Opciones de perfil</router-link>
-          <router-link to="/tickets" @click="isDropdownOpen = false">Mis boletos</router-link>
-          <hr />
-          <button class="logout-button" type="button" @click="logout">
-            {{ $t('nav.logout') }}
+        <div v-show="isDropdownOpen" class="dropdown" role="menu">
+          <router-link role="menuitem" to="/profile" @click="isDropdownOpen = false; isMobileMenuOpen = false">Opciones de perfil</router-link>
+          <router-link role="menuitem" to="/tickets" @click="isDropdownOpen = false; isMobileMenuOpen = false">Mis boletos</router-link>
+          <hr aria-hidden="true" />
+          <button role="menuitem" class="logout-button" type="button" @click="logout">
+            Cerrar sesión
           </button>
         </div>
       </div>
@@ -67,6 +92,29 @@ const logout = async () => {
 </template>
 
 <style scoped>
+.app-header {
+  position: relative;
+}
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav-links a {
+  transition: color 0.1s ease-out, transform 0.05s ease-out;
+}
+.nav-links a:hover, .nav-links a:focus-visible {
+  color: var(--primary);
+  outline: none;
+}
+.nav-links a:active {
+  transform: scale(0.95);
+}
+
 .user-menu {
   position: relative;
 }
@@ -81,6 +129,11 @@ const logout = async () => {
   gap: 8px;
   font-family: inherit;
   font-size: 1rem;
+  transition: color 0.1s ease-out;
+}
+.user-button:focus-visible {
+  outline: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
 }
 .chevron {
   font-size: 0.8rem;
@@ -110,10 +163,15 @@ const logout = async () => {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.1s ease-out, color 0.1s ease-out;
+}
+.dropdown a:focus-visible, .logout-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
 }
 .dropdown a:hover, .logout-button:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--primary);
 }
 .dropdown hr {
   margin: 0;
@@ -123,5 +181,36 @@ const logout = async () => {
 .logout-button {
   color: var(--danger);
   width: 100%;
+}
+
+@media (max-width: 960px) {
+  .hamburger {
+    display: block;
+  }
+  .nav-links, .nav-actions {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 16px 0;
+  }
+  .nav-links.mobile-open, .nav-actions.mobile-open {
+    display: flex;
+  }
+  .app-header {
+    flex-wrap: wrap;
+  }
+  .dropdown {
+    position: static;
+    box-shadow: none;
+    border: none;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .user-button {
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+  }
 }
 </style>

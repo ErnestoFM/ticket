@@ -138,56 +138,40 @@ async function runSeed() {
 
     // Create Events
     const events = [
-      {
-        venueId: vTeatro.id,
-        title: 'El Lago de los Cisnes',
-        description: 'Ballet clásico en dos actos.',
-        type: 'teatro',
-        date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-        duration: 120,
-        basePrice: 500.00,
-        createdBy: admin.id,
-      },
-      {
-        venueId: vCine.id,
-        title: 'Avengers: Secret Wars',
-        description: 'Estreno mundial de Marvel.',
-        type: 'cine',
-        date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
-        duration: 180,
-        basePrice: 150.00,
-        createdBy: admin.id,
-      },
-      {
-        venueId: vMuseo.id,
-        title: 'Noche de Museos: Frida Kahlo',
-        description: 'Recorrido nocturno y exposición especial.',
-        type: 'museo',
-        date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-        duration: 90,
-        basePrice: 100.00,
-        createdBy: admin.id,
-      },
-      {
-        venueId: vTeatro.id,
-        title: 'Stand Up Comedy Tour',
-        description: 'Las mejores risas de la temporada.',
-        type: 'teatro',
-        date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
-        duration: 100,
-        basePrice: 400.00,
-        createdBy: admin.id,
-      },
-      {
-        venueId: vCine.id,
-        title: 'Inception - 15th Anniversary',
-        description: 'Reestreno de la película clásica de Nolan.',
-        type: 'cine',
-        date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5),
-        duration: 150,
-        basePrice: 120.00,
-        createdBy: admin.id,
-      }
+      // 5 Original Events
+      { venueId: vTeatro.id, title: 'El Lago de los Cisnes', description: 'Ballet clásico en dos actos.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), duration: 120, basePrice: 500.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Avengers: Secret Wars', description: 'Estreno mundial de Marvel.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), duration: 180, basePrice: 150.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Noche de Museos: Frida Kahlo', description: 'Recorrido nocturno y exposición especial.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), duration: 90, basePrice: 100.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Stand Up Comedy Tour', description: 'Las mejores risas de la temporada.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10), duration: 100, basePrice: 400.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Inception - 15th Anniversary', description: 'Reestreno de la película clásica de Nolan.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5), duration: 150, basePrice: 120.00, createdBy: admin.id },
+      
+      // 20 New Events
+      // Teatro
+      { venueId: vTeatro.id, title: 'El Fantasma de la Ópera', description: 'El aclamado musical de Broadway.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 12), duration: 150, basePrice: 800.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Romeo y Julieta', description: 'Clásico de Shakespeare en vivo.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 16), duration: 130, basePrice: 450.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Los Miserables', description: 'Un musical inolvidable que tocará tu corazón.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 20), duration: 160, basePrice: 750.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Improvisa2', description: 'Show de improvisación teatral interactivo.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 25), duration: 90, basePrice: 200.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Cats', description: 'El espectacular musical de Andrew Lloyd Webber.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), duration: 140, basePrice: 600.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Hamlet', description: 'Ser o no ser, la eterna duda sobre el escenario.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 35), duration: 120, basePrice: 350.00, createdBy: admin.id },
+      { venueId: vTeatro.id, title: 'Monólogo de la Vida', description: 'Una reflexión profunda y divertida sobre la existencia.', type: 'teatro', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 40), duration: 80, basePrice: 250.00, createdBy: admin.id },
+      
+      // Cine
+      { venueId: vCine.id, title: 'Spider-Man: Beyond the Spider-Verse', description: 'El asombroso final de la trilogía animada.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2), duration: 140, basePrice: 150.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Dune: Part Three', description: 'La épica conclusión de la saga de Arrakis.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 8), duration: 170, basePrice: 160.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Star Wars: New Jedi Order', description: 'El esperado regreso de Rey Skywalker.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15), duration: 150, basePrice: 140.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Oppenheimer', description: 'Proyección especial en formato IMAX 70mm.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 18), duration: 180, basePrice: 200.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Maratón: El Señor de los Anillos', description: 'Versiones extendidas de la trilogía completa.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 22), duration: 720, basePrice: 400.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Interstellar - Reestreno', description: 'El aclamado clásico de ciencia ficción de Christopher Nolan.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 28), duration: 169, basePrice: 130.00, createdBy: admin.id },
+      { venueId: vCine.id, title: 'Festival de Cortos Independientes', description: 'Selección exclusiva de cine de autor internacional.', type: 'cine', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 32), duration: 120, basePrice: 90.00, createdBy: admin.id },
+      
+      // Museo
+      { venueId: vMuseo.id, title: 'Exposición: Leonardo Da Vinci', description: 'Diseños, inspiración y maquinaria del genio.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 4), duration: 120, basePrice: 120.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Van Gogh Inmersivo', description: 'Vive sus maravillosas obras desde adentro.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 9), duration: 60, basePrice: 250.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Arte Contemporáneo 2026', description: 'Descubre las nuevas voces del arte mundial.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 13), duration: 90, basePrice: 80.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Taller de Pintura Surrealista', description: 'Aprende a pintar y expresarte como Salvador Dalí.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 19), duration: 180, basePrice: 300.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Exposición: Civilizaciones Perdidas', description: 'Maravillosos restos y piezas de culturas antiguas.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 24), duration: 120, basePrice: 150.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Fotografía Nacional', description: 'Exposición de paisajes y retratos de todo México.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 27), duration: 60, basePrice: 50.00, createdBy: admin.id },
+      { venueId: vMuseo.id, title: 'Esculturas de Hielo', description: 'Arte efímero internacional en salas climatizadas.', type: 'museo', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 33), duration: 45, basePrice: 100.00, createdBy: admin.id }
     ];
 
     await Event.bulkCreate(events.map(e => ({ ...e, id: uuidv4() })));

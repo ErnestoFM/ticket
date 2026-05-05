@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 function handleValidation(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error('Validation failed:', errors.array());
     res.status(422).json({ error: 'Validation failed', details: errors.array() });
     return false;
   }
@@ -21,7 +22,7 @@ function handleValidation(req, res) {
 
 const confirmValidation = [
   body('reservationId').isUUID().withMessage('Valid reservation ID required'),
-  body('paymentMethod').isIn(['mock']).withMessage('Payment method must be mock'),
+  body('paymentMethod').isIn(['mock', 'paypal']).withMessage('Payment method must be mock or paypal'),
   body('paymentIntentId').trim().notEmpty().withMessage('Payment intent ID required'),
 ];
 
@@ -36,7 +37,7 @@ async function confirm(req, res, next) {
     const reservation = await confirmReservation(reservationId, userId);
 
     // Verify payment
-    if (paymentMethod !== 'mock') {
+    if (!['mock', 'paypal'].includes(paymentMethod)) {
       return res.status(400).json({ error: 'Invalid payment method' });
     }
 
@@ -140,7 +141,7 @@ async function getOne(req, res, next) {
       include: [
         { model: Event, as: 'event', include: [{ model: Venue, as: 'venue' }] },
         { model: Seat, as: 'seat', include: [{ model: SeatType, as: 'seatType' }] },
-        { model: User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'curp'] },
+        { model: User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'curp', 'phone'] },
       ],
     });
 
@@ -154,4 +155,35 @@ async function getOne(req, res, next) {
   }
 }
 
-module.exports = { confirm, confirmValidation, myTickets, getOne };
+async function resendWhatsApp(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const ticket = await Ticket.findOne({
+      where: { id, userId: req.user.id },
+      include: [
+        { model: Event, as: 'event', include: [{ model: Venue, as: 'venue' }] },
+        { model: Seat, as: 'seat', include: [{ model: SeatType, as: 'seatType' }] },
+        { model: User, as: 'user' },
+      ],
+    });
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    let pdfUrl = null;
+    if (ticket.pdfPath) {
+      pdfUrl = `${env.app.frontendUrl}/uploads/tickets/${ticket.id}.pdf`;
+    }
+
+    await sendTicketWhatsApp({ ...ticket.toJSON(), seat: ticket.seat, qrCode: ticket.qrCode }, ticket.user, ticket.event, pdfUrl);
+    await ticket.update({ whatsappSent: true });
+
+    return res.json({ message: 'Boleto reenviado por WhatsApp exitosamente' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { confirm, confirmValidation, myTickets, getOne, resendWhatsApp };

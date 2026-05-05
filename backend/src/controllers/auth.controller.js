@@ -171,6 +171,29 @@ async function me(req, res) {
   return res.json({ user: req.user.toJSON() });
 }
 
+const updateProfileValidation = [
+  body('phone').trim().notEmpty().withMessage('Phone is required').isLength({ min: 10, max: 15 }).withMessage('Invalid phone number'),
+];
+
+async function updateProfile(req, res, next) {
+  try {
+    if (!handleValidation(req, res)) return;
+
+    const { phone } = req.body;
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.phone = phone;
+    await user.save();
+
+    return res.json({ message: 'Profile updated successfully', user: user.toJSON() });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   register,
   registerValidation,
@@ -179,4 +202,6 @@ module.exports = {
   refresh,
   logout,
   me,
+  updateProfile,
+  updateProfileValidation,
 };

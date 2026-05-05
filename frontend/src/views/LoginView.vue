@@ -1,14 +1,21 @@
 <script setup>
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { reactive, ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 
 const form = reactive({
   curp: '',
   password: '',
+});
+
+onMounted(() => {
+  if (route.query.curp) {
+    form.curp = route.query.curp;
+  }
 });
 
 const showPassword = ref(false);

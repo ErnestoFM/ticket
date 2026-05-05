@@ -29,9 +29,16 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS - allow only frontend
+// CORS - allow frontend and ngrok for dev
 app.use(cors({
-  origin: env.app.frontendUrl,
+  origin: function (origin, callback) {
+    const allowedOrigins = [env.app.frontendUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'];
+    if (!origin || allowedOrigins.includes(origin) || origin.includes('ngrok-free.dev') || origin.includes('ngrok.io')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

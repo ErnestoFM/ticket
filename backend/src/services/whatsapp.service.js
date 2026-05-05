@@ -30,7 +30,7 @@ async function sendTicketWhatsApp(ticket, user, event, pdfUrl = null) {
     .filter(Boolean)
     .join(' ');
 
-  const messageBody = [
+  let messageBody = [
     `🎭 *TICKETMASTER MX - Tu Boleto*`,
     ``,
     `Hola ${fullName},`,
@@ -48,15 +48,33 @@ async function sendTicketWhatsApp(ticket, user, event, pdfUrl = null) {
     `¡Disfruta el evento!`,
   ].join('\n');
 
+  let formattedPhone = user.phone;
+  // WhatsApp y Twilio para México requieren a menudo el prefijo '+52 1' en lugar de solo '+52'
+  if (!formattedPhone.startsWith('+')) {
+    formattedPhone = `+521${formattedPhone}`;
+  } else if (formattedPhone.startsWith('+52') && !formattedPhone.startsWith('+521') && formattedPhone.length === 13) {
+    formattedPhone = `+521${formattedPhone.slice(3)}`;
+  }
+
+  // Como Ngrok bloquea las URLs locales, usaremos un generador público de QR
+  // para que Twilio pueda descargar la imagen sin ser bloqueado.
+  const publicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(ticket.id)}`;
+
+  if (pdfUrl && pdfUrl.includes('ngrok-free.dev')) {
+    messageBody += `\n\n📄 *Descarga tu PDF completo aquí:* ${pdfUrl}`;
+  }
+
   const messageOptions = {
     body: messageBody,
     from: env.twilio.whatsappFrom,
-    to: `whatsapp:${user.phone}`,
+    to: `whatsapp:${formattedPhone}`,
   };
 
-  if (pdfUrl) {
-    messageOptions.mediaUrl = [pdfUrl];
-  }
+  console.log(`[Twilio] Sending WhatsApp to: ${messageOptions.to}`);
+  
+  // Siempre adjuntamos el QR generado públicamente para que Twilio no falle
+  messageOptions.mediaUrl = [publicQrUrl];
+  console.log(`[Twilio] Attaching QR as media: ${publicQrUrl}`);
 
   const message = await client.messages.create(messageOptions);
   return { sid: message.sid };
@@ -87,10 +105,15 @@ async function sendCancellationWhatsApp(ticket, user, event) {
     `El equipo de Ticketmaster MX se pondrá en contacto contigo para el reembolso correspondiente.`,
   ].join('\n');
 
+  let formattedPhone = user.phone;
+  if (!formattedPhone.startsWith('+')) {
+    formattedPhone = `+52${formattedPhone}`;
+  }
+
   const message = await client.messages.create({
     body: messageBody,
     from: env.twilio.whatsappFrom,
-    to: `whatsapp:${user.phone}`,
+    to: `whatsapp:${formattedPhone}`,
   });
 
   return { sid: message.sid };
